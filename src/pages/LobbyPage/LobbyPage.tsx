@@ -1,9 +1,46 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { BACKEND_PORT } from "../../../shared/config"
+import { useParams } from "react-router-dom"
 
-export const LobbyPage: React.FC = () => {
-    const [players, setPlayers] = useState(['test1', 'test2'])
+export const LobbyPage: React.FC<{users: string[]}> = ({users}) => {
+    const {id} = useParams();
+    // const [users, setUsers] = useState<string[]>([])
+    const [isLoading, setIsLoading] = useState(false)
+    console.log('users: ', users )
+    const userDisplay = users?.map((user) => <div>{user}</div>)
+    
+    useEffect(() => {
+        setIsLoading(true)
+        // async function fetchUserList() {
+        //     try {
+        //         const response = await fetch(`http://localhost:${BACKEND_PORT}/lobby/testRoom`, {
+        //             method: 'GET',
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             }
+        //         });
+        //         console.log('result: ', response)
+                
+        //         const result = await response.json();
+        //         if (response.ok) {
+        //             console.log('result: ', result.userList)
+        //             setUsers(result.userList);
+    
+        //         } else {
+        //             throw new Error(result)
+        //         }
+                
+        //     } catch (error) {
+        //         console.log('error: ', error)
+        //     } finally {
+        //         setIsLoading(false)
+        //     }
+        // };
 
-    const playerDisplay = players.map((player) => <div>{player}</div>)
+        // console.log('id: ', id)
+        // fetchUserList();
+    }, [id])
+
 
     //TODO: makke a copy room code button
     return (
@@ -13,7 +50,8 @@ export const LobbyPage: React.FC = () => {
             <p>Room Code: 1XYO</p> 
 
             <div>
-                {playerDisplay}
+                <h2>Users:</h2>
+                {userDisplay}
             </div>
 
             <button>Start Game</button>

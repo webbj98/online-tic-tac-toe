@@ -3,6 +3,7 @@ import './Chat.css'
 
 const Chat: React.FC<{messages: Message[]}> = ({messages}) => {
 
+  console.log('messages to chat: ', messages)
   const chatDisplay = messages.map((message) => {
 
     const outputMessage = [];
@@ -11,6 +12,8 @@ const Chat: React.FC<{messages: Message[]}> = ({messages}) => {
     }
 
     outputMessage.push(message.text);
+    // console.log('message: ', message)
+    // console.log('outputMessage: ', outputMessage)
     
     return (
       <div>

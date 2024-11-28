@@ -10,7 +10,7 @@ import { HomePage } from './pages/HomePage/HomePage';
 import { GamePage } from './pages/GamePage/GamePage';
 import { LobbyPage } from './pages/LobbyPage/LobbyPage';
 import { socket } from './socket';
-import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/misc'
+import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/config'
 import { Events } from '../shared/events';
 import Chat from './components/Chat/Chat';
 import {Message, MessageType} from '../shared/model';
@@ -22,7 +22,8 @@ function App() {
   const [fooEvents, setFooEvents] = useState<string[]>([]);
   // const [roomMsgs, setRoomMsgs] = useState<string[]>([]);
   const [chat, setChat] = useState<Message[]>([]);
-  const [chatMessage, setChatMessage] = useState('')
+  const [chatMessage, setChatMessage] = useState('');
+  const [userList, setUserList] = useState<string[]>([])
   
   useEffect(() => {
     function onConnect() {
@@ -48,7 +49,18 @@ function App() {
     // }
 
     function onAddMessageToChat(message: Message) {
+      console.log('got message: ', message)
       setChat((prev) => [...prev, message])
+    }
+
+    function onUpdateUserList(user: string) {
+      console.log('userList got update: ', user)
+
+      setUserList((prev) => [...prev, user])
+    }
+
+    function onGetUserList(users: string[]) {
+      setUserList(users)
     }
 
     socket.on('connect', onConnect);
@@ -57,8 +69,11 @@ function App() {
 
     socket.on('pingEvent', onPingEvent);
     // socket.on(ROOM_EVENT_NAME, onRoomMsg);
-    socket.on(Events.ChatPlayerMessage, onAddMessageToChat);
-    socket.on(Events.ChatSystemMessage, onAddMessageToChat);
+    socket.on(Events.ChatMessage, onAddMessageToChat);
+    socket.on(Events.UserListUpdate, onUpdateUserList);
+    socket.on(Events.UserListGet, onGetUserList)
+    // socket.on(Events.LobbyUpdate, )
+    // socket.on(Events.ChatMessage, onAddMessageToChat);
 
     return () => {
       socket.off('connect', onConnect);
@@ -66,8 +81,10 @@ function App() {
       socket.off('foo', onFooEvent);
       socket.off('pingEvent', onPingEvent)
       // socket.off(ROOM_EVENT_NAME, onRoomMsg);
-      socket.off(Events.ChatPlayerMessage, onAddMessageToChat);
-      socket.off(Events.ChatSystemMessage, onAddMessageToChat);
+      socket.off(Events.ChatMessage, onAddMessageToChat);
+      socket.off(Events.UserListUpdate, onUpdateUserList)
+      socket.off(Events.UserListGet, onGetUserList)
+      // socket.off(Events.ChatSystemMessage, onAddMessageToChat);
     }
   }, [])
   
@@ -78,7 +95,7 @@ function App() {
     },
     {
       path: '/lobby/:uuid',
-      element: <LobbyPage />
+      element: <LobbyPage users={userList} />
     },
     {
       path: '/game',
@@ -114,7 +131,7 @@ function App() {
       senderName: socket.id
     };
 
-    socket.emit(Events.ChatPlayerMessage, message)
+    socket.emit(Events.ChatMessage, message)
   }
 
   

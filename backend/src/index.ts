@@ -2,13 +2,15 @@ import express from 'express';
 import {createServer } from 'node:http'
 import cors from 'cors';
 import {Server } from 'socket.io';
-import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/misc'
+import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
 import {Events} from '../../shared/events'
-import {Lobby, Message} from '../../shared/model'
+import {Lobby, Message, MessageType} from '../../shared/model'
+import { BACKEND_PORT } from '../../shared/config';
+import { Socket } from 'socket.io-client';
 
 const app = express();
 const server = createServer(app);
-const port = 3001;
+const port = BACKEND_PORT;
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5174"
@@ -21,8 +23,24 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
+    console.log('lmao')
     res.send('Hello from Express TypeScript!');
 });
+
+// app.get('/')
+app.get('/lobby/:id', (req, res) => {
+    const id = req.params.id;
+    console.log('id: ', id)
+    console.log('rooms: ', io.of('/').adapter.rooms)
+    const usersInLobby = io.of('/').adapter.rooms.get(id);
+    console.log('reached lobby: ', usersInLobby)
+    const userList = Array.from(usersInLobby || []);
+    
+    console.log('userList: ', userList)
+    res.status(200).json({
+        userList
+    })
+})
 
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -39,27 +57,47 @@ io.on('connection', (socket) => {
         const lobbyName = crypto.randomUUID();
         // socket.join(lobby.uuid);
         socket.join(lobbyName);
+        sendJoinLobbyMessage(io, socket.id, lobbyName)
     });
 
     socket.on(Events.LobbyJoin, (roomKey) => {
         socket.join(roomKey);
-        io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
+        sendJoinLobbyMessage(io, socket.id, roomKey);
+        socket.to(roomKey).emit(Events.UserListUpdate, socket.id);
+        socket.emit(Events.UserListGet, getLobbyUsers(io, roomKey));
+        // io.to(roomKey).emit(Events.UserListUpdate, socket.id);
+        // io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
         console.log(`${socket.id} joined the room`)
-        
     })
 
-    socket.on(ROOM_EVENT_NAME, () => {
-        console.log('sending room msg')
-        io.to(TEST_ROOM_NAME).emit(ROOM_EVENT_NAME, 'HERE ROOM MSG')
-    });
+    socket.on(Events.LobbyUpdate, (lobbyKey) => {
+        io.to(TEST_ROOM_NAME).emit(Events.LobbyUpdate)
+    } )
 
-    socket.on(Events.ChatPlayerMessage, (message: Message) => {
-        io.to(TEST_ROOM_NAME).emit(Events.ChatPlayerMessage, message)
+    // socket.on(Events.UserListUpdate, (lobbyKey) => {
+    //     io.to(TEST_ROOM_NAME).emit(Events.LobbyUpdate)
+    // } )
+
+    socket.on(Events.ChatMessage, (message: Message) => {
+        console.log(io.of('/').adapter.rooms);
+        io.to(TEST_ROOM_NAME).emit(Events.ChatMessage, message)
     })
 
     // socket.on()
 })
 
+function sendJoinLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
+    
+    const message: Message = {
+        type: MessageType.SYSTEM,
+        text: `${socketId} joined the lobby`
+    }
+    io.to(lobbyKey).emit(Events.ChatMessage, message)
+}
+
+function getLobbyUsers(io: Server, lobbyKey: string) {
+    return Array.from(io.of('/').adapter.rooms.get(lobbyKey) || [])
+}
 // io.on('joinRoom', (socket) => {
 //     console.log(`User ${socket.id} joining room`);
 //     // socket.join(TEST_ROOM_NAME);
