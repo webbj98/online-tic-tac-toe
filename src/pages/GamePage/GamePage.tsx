@@ -46,7 +46,7 @@ function findWinner(board: string[]) {
   }
   // [1,2,3,4,5,6,7,8,9]
 
-  console.log('******************************')
+  // console.log('******************************')
 
   for (let j = 0; j < startCols; j++) {
     let preVal = board[j];
@@ -56,10 +56,10 @@ function findWinner(board: string[]) {
     }
     for (let i = 0; i < board.length; i += startRows) {
       const curVal = board[i + j]
-      console.log('-------')
-      console.log('cur idx: ', i+j);
-      console.log('curVal: ', curVal)
-      console.log('prevVal: ', preVal)
+      // console.log('-------')
+      // console.log('cur idx: ', i+j);
+      // console.log('curVal: ', curVal)
+      // console.log('prevVal: ', preVal)
       // const curIdx = i + j;
       
       if (preVal == curVal && i + startRows >= board.length) {
@@ -150,7 +150,7 @@ export const GamePage: React.FC = () => {
     status = 'Draw!'
   }
 
-  console.log('hi')
+  // console.log('hi')
   return (
     <div>
       <h1>Game</h1>
