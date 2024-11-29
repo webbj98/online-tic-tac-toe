@@ -19,7 +19,7 @@ import UserNameInput from './pages/LobbyPage/UserNameInput';
 
 function App() {
   // TODO: make game path have an id
-
+  
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [chat, setChat] = useState<Message[]>([]);
   const [chatMessage, setChatMessage] = useState('');

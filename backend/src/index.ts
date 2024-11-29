@@ -50,12 +50,15 @@ io.on('connection', (socket) => {
     // we have to set up the listeners in the connection listener because
     // we need to establish that when get event from the socket, I can perform the task
     // (we probably don't want to get events from sockets that haven't connected)
-    socket.on(Events.LobbyCreate, () => {
+    socket.on(Events.LobbyCreate, (callback) => {
         console.log(`User ${socket.id} joining room`);
         const lobbyName = crypto.randomUUID();
         // socket.join(lobby.uuid);
         socket.join(lobbyName);
         sendJoinLobbyMessage(io, socket.id, lobbyName)
+        callback({
+            newLobbyKey: lobbyName,
+        })
     });
 
     socket.on(Events.LobbyJoin, (roomKey) => {

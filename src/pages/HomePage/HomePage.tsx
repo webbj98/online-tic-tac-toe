@@ -1,16 +1,40 @@
-import { Link } from "react-router-dom"
-
+import { Link, useNavigate } from "react-router-dom"
+import { socket } from '../../socket';
+import { Events } from "../../../shared/events";
+import { useEffect, useState } from "react";
 
 export const HomePage: React.FC = () => {
+    const navigate = useNavigate()
     console.log('hi')
+    // const [redirected, setRedirected] = useState(false);
+    const [lobbyKey, setNewLobbyKey] = useState('')
+
+
+
+    useEffect(() => {
+        if (lobbyKey) {
+            navigate(`/lobby/${lobbyKey}`)
+        }
+
+    }, [lobbyKey, navigate])
+
+    const handleCreateLobby = () => {
+        socket.emit(Events.LobbyCreate, (newLobbyKey: string) => {
+            console.log('newLobbyKey: ', newLobbyKey)
+            setNewLobbyKey(newLobbyKey.newLobbyKey)
+            // setRedirected(true)
+        })
+        
+
+    }
 
     return (
         <div>
             <h1>Home Screen</h1>
 
-            <button>Create Lobby</button>
+            <button onClick={handleCreateLobby}>Create Lobby</button>
             <Link to='/game'>To Game</Link>
-            <button ></button>
+            <button onClick={() => navigate('/lobby/testName')} >fgdgfd</button>
         </div>
     )
 }
