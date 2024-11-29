@@ -68,27 +68,6 @@ function App() {
       // socket.off(Events.ChatSystemMessage, onAddMessageToChat);
     }
   }, [])
-  
-  const handleSetUserName = (name: string) => {
-    socket.emit(Events.UserSetName, name)
-    setUserName(name)
-
-  }
-
-  const router = createBrowserRouter([
-    {
-      path: '/',
-      element: <HomePage />
-    },
-    {
-      path: '/lobby/:uuid',
-      element: <LobbyPage users={userList} userName={userName} onSetUserName={handleSetUserName} />
-    },
-    {
-      path: '/game',
-      element: <GamePage />
-    }
-  ])
 
 
   const connect = () => {
@@ -107,18 +86,47 @@ function App() {
   }
 
   const joinRoom = () => {
-    socket.emit(Events.LobbyJoin, TEST_ROOM_NAME)
+    socket.emit(Events.LobbyJoin, window.location.href)
   }
 
-  const sendMessage = (inputMsg: string) => {
+  const sendMessage = (inputMsg: string, lobbyKey?: string) => {
     const message: Message = {
       type: MessageType.USER,
       text: inputMsg,
-      senderName: userName
+      senderName: userName,
+      ...(lobbyKey ? {lobbyKey} : {})
     };
 
     socket.emit(Events.ChatMessage, message)
   }
+
+  const handleSetUserName = (name: string) => {
+    socket.emit(Events.UserSetName, name)
+    setUserName(name)
+    joinRoom()
+  }
+  
+  
+
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <HomePage />
+    },
+    {
+      path: '/lobby/:uuid',
+      element: <LobbyPage users={userList} userName={userName} onSetUserName={handleSetUserName} />
+    },
+    {
+      path: '/game',
+      element: <GamePage />
+    }
+  ])
+
+
+  
+
+  
 
   return (
     <div>
@@ -128,7 +136,6 @@ function App() {
       <RouterProvider router={router} />
       <button onClick={connect}>Connect</button>
       <button onClick={disconnect}>Disconnect</button>
-      <button onClick={createLobby}>Create Lobby</button>
       <button onClick={joinRoom}>Join Room</button>
       
       <Chat messages={chat} onSend={sendMessage}/>

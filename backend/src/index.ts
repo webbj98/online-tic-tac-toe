@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
         const lobbyName = crypto.randomUUID();
         // socket.join(lobby.uuid);
         socket.join(lobbyName);
-        sendJoinLobbyMessage(io, socket.id, lobbyName)
+        // sendJoinLobbyMessage(io, socket.id, lobbyName)
         callback({
             newLobbyKey: lobbyName,
         })
@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on(Events.LobbyUpdate, (lobbyKey) => {
-        io.to(TEST_ROOM_NAME).emit(Events.LobbyUpdate)
+        io.to(lobbyKey).emit(Events.LobbyUpdate)
     } )
 
     socket.on(Events.UserSetName, (name: string) => {
@@ -82,7 +82,11 @@ io.on('connection', (socket) => {
 
     socket.on(Events.ChatMessage, (message: Message) => {
         console.log(io.of('/').adapter.rooms);
-        io.to(TEST_ROOM_NAME).emit(Events.ChatMessage, message)
+        if (message.lobbyKey) {
+            io.to(message.lobbyKey).emit(Events.ChatMessage, message);
+        } else {
+            io.emit(Events.ChatMessage, message)
+        }        
     })
 })
 
@@ -100,10 +104,6 @@ function getLobbyUsers(io: Server, lobbyKey: string) {
 
     return userSocketids.map((socketId) => socketUserNameMap.get(socketId));
 }
-// io.on('joinRoom', (socket) => {
-//     console.log(`User ${socket.id} joining room`);
-//     // socket.join(TEST_ROOM_NAME);
-// })
 
 server.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

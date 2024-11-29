@@ -26,4 +26,5 @@ export interface Message {
     type: MessageType;
     text: string;
     senderName?: string;
+    lobbyKey?: string;
 }
