@@ -1,29 +1,49 @@
+import { useState } from 'react'
 import { Message, MessageType } from '../../../shared/model'
 import './Chat.css'
 
-const Chat: React.FC<{messages: Message[]}> = ({messages}) => {
+const Chat: React.FC<{messages: Message[], onSend: (msg: string) => void}> = ({messages, onSend}) => {
 
-  console.log('messages to chat: ', messages)
+  const [currentMsg, setCurrentMsg] = useState('')
   const chatDisplay = messages.map((message) => {
 
     const outputMessage = [];
+    let userNamePrefix;
     if (message.type == MessageType.USER) {
-      outputMessage.push(`${message.senderName}:`)
+      // outputMessage.push(`${message.senderName}:`)
+      userNamePrefix = <span className='username'>{message.senderName}: </span>
     }
 
     outputMessage.push(message.text);
-    // console.log('message: ', message)
-    // console.log('outputMessage: ', outputMessage)
-    
     return (
-      <div>
-        {outputMessage.join(' ')}
+      <div className='chat-message'>
+        
+        {userNamePrefix}{message.text}
       </div>
     )
   })
+
+  const handleSendMsg = () => {
+    onSend(currentMsg);
+    setCurrentMsg('')
+
+
+  }
+
   return (
     <div className="chat">
-      {chatDisplay}
+      <div className='chat-messages'>
+        {chatDisplay}
+      </div>
+
+      <div className='chat-action-row'>
+        <input className='chat-input' value={currentMsg} onChange={(event) => setCurrentMsg(event.target.value)}  />
+        <button onClick={() => handleSendMsg()}>Send Message</button>
+
+      </div>
+      
+
+      
 
 
     </div>

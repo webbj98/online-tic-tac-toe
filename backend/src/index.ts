@@ -46,10 +46,6 @@ app.get('/lobby/:id', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    socket.on('pingEvent', (msg) => {
-        io.emit('pingEvent', 'pong')
-        console.log('PONG')
-    });
 
     // we have to set up the listeners in the connection listener because
     // we need to establish that when get event from the socket, I can perform the task
@@ -81,16 +77,10 @@ io.on('connection', (socket) => {
         socketUserNameMap.set(socket.id, name)
     })
 
-    // socket.on(Events.UserListUpdate, (lobbyKey) => {
-    //     io.to(TEST_ROOM_NAME).emit(Events.LobbyUpdate)
-    // } )
-
     socket.on(Events.ChatMessage, (message: Message) => {
         console.log(io.of('/').adapter.rooms);
         io.to(TEST_ROOM_NAME).emit(Events.ChatMessage, message)
     })
-
-    // socket.on()
 })
 
 function sendJoinLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
@@ -110,15 +100,6 @@ function getLobbyUsers(io: Server, lobbyKey: string) {
 // io.on('joinRoom', (socket) => {
 //     console.log(`User ${socket.id} joining room`);
 //     // socket.join(TEST_ROOM_NAME);
-// })
-
-// io.on(ROOM_EVENT_NAME, (socket) => {
-    
-// } )
-
-
-// io.on('pingEvent', (socket) => {
-//     console.log(socket.)
 // })
 
 server.listen(port, () => {
