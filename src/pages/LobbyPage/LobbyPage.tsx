@@ -1,64 +1,16 @@
 import { useEffect, useState } from "react"
 import { BACKEND_PORT } from "../../../shared/config"
 import { useParams } from "react-router-dom"
+import UserNameInput from "./UserNameInput";
+import { LobbyMain } from "./LobbyMain";
 
-export const LobbyPage: React.FC<{users: string[]}> = ({users}) => {
-    const {id} = useParams();
-    // const [users, setUsers] = useState<string[]>([])
-    const [isLoading, setIsLoading] = useState(false)
-    console.log('users: ', users )
-    const userDisplay = users?.map((user) => <div>{user}</div>)
+export const LobbyPage: React.FC<{users: string[], userName: string, onSetUserName: (name: string) => void}> = ({users, userName, onSetUserName}) => {
     
-    useEffect(() => {
-        setIsLoading(true)
-        // async function fetchUserList() {
-        //     try {
-        //         const response = await fetch(`http://localhost:${BACKEND_PORT}/lobby/testRoom`, {
-        //             method: 'GET',
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             }
-        //         });
-        //         console.log('result: ', response)
-                
-        //         const result = await response.json();
-        //         if (response.ok) {
-        //             console.log('result: ', result.userList)
-        //             setUsers(result.userList);
-    
-        //         } else {
-        //             throw new Error(result)
-        //         }
-                
-        //     } catch (error) {
-        //         console.log('error: ', error)
-        //     } finally {
-        //         setIsLoading(false)
-        //     }
-        // };
-
-        // console.log('id: ', id)
-        // fetchUserList();
-    }, [id])
-
+    if (userName) {
+        return <LobbyMain users={users} userName={userName} />
+    } else {
+        return <UserNameInput onSubmitName={onSetUserName} />
+    }
 
     //TODO: makke a copy room code button
-    return (
-        <div>
-            <h1>Lobby Page</h1>
-
-            <p>Room Code: 1XYO</p> 
-
-            <div>
-                <h2>Users:</h2>
-                {userDisplay}
-            </div>
-
-            <button>Start Game</button>
-
-
-
-
-        </div>
-    )
 }

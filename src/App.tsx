@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
   createBrowserRouter,
-  RouterProvider
+  RouterProvider,
+  useNavigate
 } from 'react-router-dom';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
@@ -14,6 +15,7 @@ import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/config'
 import { Events } from '../shared/events';
 import Chat from './components/Chat/Chat';
 import {Message, MessageType} from '../shared/model';
+import UserNameInput from './pages/LobbyPage/UserNameInput';
 
 function App() {
   // TODO: make game path have an id
@@ -23,7 +25,9 @@ function App() {
   // const [roomMsgs, setRoomMsgs] = useState<string[]>([]);
   const [chat, setChat] = useState<Message[]>([]);
   const [chatMessage, setChatMessage] = useState('');
-  const [userList, setUserList] = useState<string[]>([])
+  const [userList, setUserList] = useState<string[]>([]);
+  const [userName, setUserName] = useState('');
+  // const navigate = useNavigate();
   
   useEffect(() => {
     function onConnect() {
@@ -88,6 +92,12 @@ function App() {
     }
   }, [])
   
+  const handleSetUserName = (name: string) => {
+    socket.emit(Events.UserSetName, name)
+    setUserName(name)
+
+  }
+
   const router = createBrowserRouter([
     {
       path: '/',
@@ -95,7 +105,7 @@ function App() {
     },
     {
       path: '/lobby/:uuid',
-      element: <LobbyPage users={userList} />
+      element: <LobbyPage users={userList} userName={userName} onSetUserName={handleSetUserName} />
     },
     {
       path: '/game',
@@ -117,7 +127,10 @@ function App() {
   }
 
   const createLobby = () => {
-    socket.emit(Events.LobbyCreate)
+    socket.emit(Events.LobbyCreate, (newLobbyKey: string) => {
+      // navigate(`navigate/${newLobbyKey}`)
+      
+    })
   }
 
   const joinRoom = () => {
@@ -128,14 +141,15 @@ function App() {
     const message: Message = {
       type: MessageType.USER,
       text: chatMessage,
-      senderName: socket.id
+      senderName: userName
     };
 
     socket.emit(Events.ChatMessage, message)
   }
 
+
   
-  console.log('chat: ', chat)
+  console.log('userName: ', userName)
   return (
     <div>
       sdfsd

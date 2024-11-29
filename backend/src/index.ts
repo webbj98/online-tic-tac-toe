@@ -17,6 +17,8 @@ const io = new Server(server, {
       }
 })
 
+const socketUserNameMap = new Map<string, string>()
+
 // const io = new Server(app)
 
 app.use(cors());
@@ -62,8 +64,9 @@ io.on('connection', (socket) => {
 
     socket.on(Events.LobbyJoin, (roomKey) => {
         socket.join(roomKey);
+        console.log('socketUserNameMap: ', socketUserNameMap)
         sendJoinLobbyMessage(io, socket.id, roomKey);
-        socket.to(roomKey).emit(Events.UserListUpdate, socket.id);
+        socket.to(roomKey).emit(Events.UserListUpdate, socketUserNameMap.get(socket.id));
         socket.emit(Events.UserListGet, getLobbyUsers(io, roomKey));
         // io.to(roomKey).emit(Events.UserListUpdate, socket.id);
         // io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
@@ -73,6 +76,10 @@ io.on('connection', (socket) => {
     socket.on(Events.LobbyUpdate, (lobbyKey) => {
         io.to(TEST_ROOM_NAME).emit(Events.LobbyUpdate)
     } )
+
+    socket.on(Events.UserSetName, (name: string) => {
+        socketUserNameMap.set(socket.id, name)
+    })
 
     // socket.on(Events.UserListUpdate, (lobbyKey) => {
     //     io.to(TEST_ROOM_NAME).emit(Events.LobbyUpdate)
@@ -90,13 +97,15 @@ function sendJoinLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
     
     const message: Message = {
         type: MessageType.SYSTEM,
-        text: `${socketId} joined the lobby`
+        text: `${socketUserNameMap.get(socketId)} joined the lobby`
     }
     io.to(lobbyKey).emit(Events.ChatMessage, message)
 }
 
 function getLobbyUsers(io: Server, lobbyKey: string) {
-    return Array.from(io.of('/').adapter.rooms.get(lobbyKey) || [])
+    const userSocketids = Array.from(io.of('/').adapter.rooms.get(lobbyKey) || []);
+
+    return userSocketids.map((socketId) => socketUserNameMap.get(socketId));
 }
 // io.on('joinRoom', (socket) => {
 //     console.log(`User ${socket.id} joining room`);

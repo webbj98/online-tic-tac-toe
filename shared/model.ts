@@ -1,11 +1,11 @@
-export interface Player {
-    uuid: string;
+export interface User {
+    // uuid: string;
     displayName: string;
 }
 
 export interface Lobby {
     uuid: string;
-    playerList: Player[];
+    userList: User[];
     status: LobbyStatus;
     gameState: string[];
 }
