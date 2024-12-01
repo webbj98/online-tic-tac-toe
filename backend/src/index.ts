@@ -4,8 +4,9 @@ import cors from 'cors';
 import {Server } from 'socket.io';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
 import {Events} from '../../shared/events'
-import {Game, Lobby, Message, MessageType} from '../../shared/model'
+import {Game, Message, MessageType} from '../../shared/model'
 import { BACKEND_PORT } from '../../shared/config';
+import { Lobby } from './classes/Lobby';
 // import { Socket } from 'socket.io-client';
 
 const app = express();
@@ -28,6 +29,7 @@ const initBoard = new Array<string>(startRows * startCols).fill(BLANK_SYMBOL);
 
 const socketUserNameMap = new Map<string, string>()
 const lobbyGameMap = new Map<string, Game>(); 
+const keyLobbyMap = new Map<string, Lobby>()
 // const io = new Server(app)
 
 app.use(cors());
@@ -61,21 +63,31 @@ io.on('connection', (socket) => {
     // (we probably don't want to get events from sockets that haven't connected)
     socket.on(Events.LobbyCreate, (callback) => {
         console.log(`User ${socket.id} joining room`);
-        const lobbyName = crypto.randomUUID();
+        // const lobbyName = crypto.randomUUID();
+        const newLobby = new Lobby(socket, io);
+        keyLobbyMap.set(newLobby.key, newLobby)
         // socket.join(lobby.uuid);
-        socket.join(lobbyName);
-        // sendJoinLobbyMessage(io, socket.id, lobbyName)
+        // socket.join(lobbyName);
+        sendJoinLobbyMessage(io, socket.id, newLobby.key)
         callback({
-            newLobbyKey: lobbyName,
+            newLobbyKey: newLobby.key,
         })
     });
 
-    socket.on(Events.LobbyJoin, (roomKey) => {
-        socket.join(roomKey);
-        console.log('socketUserNameMap: ', socketUserNameMap)
-        sendJoinLobbyMessage(io, socket.id, roomKey);
-        socket.to(roomKey).emit(Events.UserListUpdate, socketUserNameMap.get(socket.id));
-        socket.emit(Events.UserListGet, getLobbyUsers(io, roomKey));
+    socket.on(Events.LobbyJoin, (lobbyKey) => {
+        // socket.join(lobbyKey)
+        console.log('loby: key: ', lobbyKey)
+        console.log('keyLoby: ', keyLobbyMap.entries())
+        const lobby = keyLobbyMap.get(lobbyKey)
+        if (!lobby) {
+            throw Error(`Tried to join lobby ${lobbyKey} which does not exist`)
+        }
+        lobby.join(socket);
+
+        // console.log('socketUserNameMap: ', socketUserNameMap)
+        sendJoinLobbyMessage(io, socket.id, lobbyKey);
+        socket.to(lobbyKey).emit(Events.UserListUpdate, socketUserNameMap.get(socket.id));
+        socket.emit(Events.UserListGet, getLobbyUsers(io, lobbyKey));
         // io.to(roomKey).emit(Events.UserListUpdate, socket.id);
         // io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
         console.log(`${socket.id} joined the room`)
@@ -90,7 +102,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on(Events.ChatMessage, (message: Message) => {
-        console.log(io.of('/').adapter.rooms);
+        // console.log(io.of('/').adapter.rooms);
         if (message.lobbyKey) {
             io.to(message.lobbyKey).emit(Events.ChatMessage, message);
         } else {
