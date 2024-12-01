@@ -6,6 +6,9 @@ export const Events = {
     UserListGet: 'userList:get',
     UserSetName: 'user:setName',
     ChatMessage: 'chat:message',
+    GameStart: 'game:start',
+    GamePlaceSymbol: 'game:placeSymbol',
+    GameUpdate: 'game:update'
     
     // ChatSystemMessage: 'chat:systemMessage',
 } as const;

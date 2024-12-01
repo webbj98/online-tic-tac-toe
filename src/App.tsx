@@ -14,7 +14,7 @@ import { socket } from './socket';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/config'
 import { Events } from '../shared/events';
 import Chat from './components/Chat/Chat';
-import {Message, MessageType} from '../shared/model';
+import {Game, Message, MessageType} from '../shared/model';
 import UserNameInput from './pages/LobbyPage/UserNameInput';
 
 function App() {
@@ -25,6 +25,7 @@ function App() {
   const [chatMessage, setChatMessage] = useState('');
   const [userList, setUserList] = useState<string[]>([]);
   const [userName, setUserName] = useState('');
+  const [curGame, setCurGame] = useState<Game>();
   // const navigate = useNavigate();
   
   useEffect(() => {
@@ -48,13 +49,25 @@ function App() {
       setUserList(users)
     }
 
+    function onGameStart(game: Game) {
+      // navigate to game page
+      setCurGame(game)
+      console.log('navigate to new page: ')
+    }
+
+    function onGameUpdate(game: Game) {
+      setCurGame(game)
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
 
     // socket.on(ROOM_EVENT_NAME, onRoomMsg);
     socket.on(Events.ChatMessage, onAddMessageToChat);
     socket.on(Events.UserListUpdate, onUpdateUserList);
-    socket.on(Events.UserListGet, onGetUserList)
+    socket.on(Events.UserListGet, onGetUserList);
+    socket.on(Events.GameStart, onGameStart);
+    socket.on(Events.GameUpdate, onGameUpdate)
     // socket.on(Events.LobbyUpdate, )
     // socket.on(Events.ChatMessage, onAddMessageToChat);
 
@@ -63,8 +76,10 @@ function App() {
       socket.off('disconnect', onDisconnect);
       // socket.off(ROOM_EVENT_NAME, onRoomMsg);
       socket.off(Events.ChatMessage, onAddMessageToChat);
-      socket.off(Events.UserListUpdate, onUpdateUserList)
-      socket.off(Events.UserListGet, onGetUserList)
+      socket.off(Events.UserListUpdate, onUpdateUserList);
+      socket.off(Events.UserListGet, onGetUserList);
+      socket.off(Events.GameStart, onGameStart);
+      socket.off(Events.GameUpdate, onGameUpdate);
       // socket.off(Events.ChatSystemMessage, onAddMessageToChat);
     }
   }, [])
@@ -119,14 +134,9 @@ function App() {
     },
     {
       path: '/game',
-      element: <GamePage />
+      element: <GamePage game={curGame} />
     }
   ])
-
-
-  
-
-  
 
   return (
     <div>

@@ -1,6 +1,7 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import "./GamePage.css"
 import { Board } from '../../components/Board/Board';
+import { Game } from '../../../shared/model';
 
 // display 
     // board
@@ -109,12 +110,21 @@ function findWinner(board: string[]) {
 function checkIsDraw(board: string[]) {
   return !board.includes(BLANK_SYMBOL);
 }
-export const GamePage: React.FC = () => {
+export const GamePage: React.FC<{game: Game | undefined}> = ({game}) => {
+
+  
 
   const [board, setBoard] = useState<string[]>([...initBoard]);
   // TODO: should be currentPlayerIdx
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState(0);
 
+  useEffect(() => {
+
+  }, [])
+
+  if (!game) {
+    return <h1>Issue: No game</h1>
+  }
   const winner = findWinner(board);
   const isDraw = checkIsDraw(board);
 

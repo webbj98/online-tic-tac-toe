@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { socket } from "../../socket";
+import { Events } from "../../../shared/events";
 
 export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users, userName}) => {
     const {id} = useParams();
@@ -40,6 +42,10 @@ export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users,
         // fetchUserList();
     }, [id])
 
+    const handleStartGame = () => {
+        socket.emit(Events.GameStart);
+    }
+
     //TODO: makke a copy room code button
     return (
         <div>
@@ -52,7 +58,7 @@ export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users,
                 {userDisplay}
             </div>
 
-            <button>Start Game</button>
+            <button onClick={handleStartGame}>Start Game</button>
 
 
 

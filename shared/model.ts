@@ -28,3 +28,10 @@ export interface Message {
     senderName?: string;
     lobbyKey?: string;
 }
+
+export interface Game {
+    board: string[];
+    playerSymbols: Map<string, string>;
+    lobbyKey: string;
+    playerTurn: string;
+}

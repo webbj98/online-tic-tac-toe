@@ -7,4 +7,10 @@ const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhos
 //TODO:  prevent auto connect so only happens when press connect button
     // explained in the TIP section
     // https://socket.io/how-to/use-with-react
+
 export const socket = io(URL);
+// function getSocketLobby() {
+
+    
+
+// }
