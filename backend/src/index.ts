@@ -4,9 +4,10 @@ import cors from 'cors';
 import {Server } from 'socket.io';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
 import {Events} from '../../shared/events'
-import {Game, Message, MessageType} from '../../shared/model'
+import {Game as GameClient, Message, MessageType} from '../../shared/model'
 import { BACKEND_PORT } from '../../shared/config';
 import { Lobby } from './classes/Lobby';
+import { Game } from './classes/Game';
 // import { Socket } from 'socket.io-client';
 
 const app = express();
@@ -64,8 +65,10 @@ io.on('connection', (socket) => {
     socket.on(Events.LobbyCreate, (callback) => {
         console.log(`User ${socket.id} joining room`);
         // const lobbyName = crypto.randomUUID();
+        console.log('rooms socket is in: before lobby create ', [...socket.rooms.keys()])
         const newLobby = new Lobby(socket, io);
         keyLobbyMap.set(newLobby.key, newLobby)
+        console.log('rooms socket is in: after lobby create ', [...socket.rooms.keys()])
         // socket.join(lobby.uuid);
         // socket.join(lobbyName);
         sendJoinLobbyMessage(io, socket.id, newLobby.key)
@@ -76,12 +79,14 @@ io.on('connection', (socket) => {
 
     socket.on(Events.LobbyJoin, (lobbyKey) => {
         // socket.join(lobbyKey)
+        console.log('IN LOBY JOIN EVENT-------------')
         console.log('loby: key: ', lobbyKey)
-        console.log('keyLoby: ', keyLobbyMap.entries())
+        // console.log('keyLoby: ', keyLobbyMap.entries())
         const lobby = keyLobbyMap.get(lobbyKey)
         if (!lobby) {
             throw Error(`Tried to join lobby ${lobbyKey} which does not exist`)
         }
+        
         lobby.join(socket);
 
         // console.log('socketUserNameMap: ', socketUserNameMap)
@@ -91,6 +96,7 @@ io.on('connection', (socket) => {
         // io.to(roomKey).emit(Events.UserListUpdate, socket.id);
         // io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
         console.log(`${socket.id} joined the room`)
+        // console.log('rooms socket is in: ', [...socket.rooms.keys()])
     })
 
     socket.on(Events.LobbyUpdate, (lobbyKey) => {
@@ -115,37 +121,52 @@ io.on('connection', (socket) => {
 
         //TODO: change how getting curRoom works. Make it better
         // TODO: Also, make the getting of the socket type better
-        const curRoom = [...socket.rooms.keys()][0];
-        const lobbyUsers = getLobbyUsers(io, curRoom);
+        const curLobbyKey = [...socket.rooms.keys()][1];
+        // console.log('curLobbyKey: ', curLobbyKey);
+        // console.log(`rooms ${socketUserNameMap.get(socket.id)} is in: `, socket.rooms.keys())
+        // console.log('keyLobbyMap: ', keyLobbyMap)
+
+        
+        const lobbyUsers = getLobbyUsers(io, curLobbyKey);
         const filteredUsers = lobbyUsers.filter((user) => user != undefined);
 
+        const curLobby = keyLobbyMap.get(curLobbyKey);
 
-        const playerSymbols = new Map<string, string>([
-            [filteredUsers[0], PLAYER_ONE_SYMBOL],
-            [filteredUsers[1], PLAYER_TWO_SYMBOL],
-        ])
-        const newGame: Game = {
-            board: initBoard,
-            playerSymbols: playerSymbols,
-            lobbyKey: curRoom,
-            playerTurn: PLAYER_ONE_SYMBOL,
+        if (!curLobby) {
+            throw Error(`Player ${socketUserNameMap.get(socket.id)} is not in a lobby.`)
         }
 
-        io.to(curRoom).emit(Events.GameStart, newGame);
+        const newGame = new Game(filteredUsers)
+        curLobby.game = newGame
+
+        // const game = new Game()
+
+        console.log('newGame player symbol: ', newGame.playerIdSymbolMap)
+        const newGameClient: GameClient = {
+            board: initBoard,
+            playerSymbols: Object.fromEntries(newGame.playerIdSymbolMap),
+            lobbyKey: curLobbyKey,
+            playerTurnId: newGame.playerTurnId,
+            gameState: newGame.gameState,
+            winnerId: newGame.winnerId
+        }
+
+        io.to(curLobbyKey).emit(Events.GameStart, newGameClient);
         
     })
 
     socket.on(Events.GamePlaceSymbol, (tileIdx: number) => {
+        
         const curRoom = [...socket.rooms.keys()][0];
         const curGame = lobbyGameMap.get(curRoom)!;
         // TODO: probably make playerTurn be playerTurnSymbol
-        curGame.board[tileIdx] = curGame.playerTurn;
+        // curGame.board[tileIdx] = curGame.playerTurn;
 
-        if (curGame.playerTurn === PLAYER_ONE_SYMBOL) {
-            curGame.playerTurn = PLAYER_TWO_SYMBOL;
-        } else {
-            curGame.playerTurn = PLAYER_ONE_SYMBOL
-        }
+        // if (curGame.playerTurn === PLAYER_ONE_SYMBOL) {
+        //     curGame.playerTurn = PLAYER_TWO_SYMBOL;
+        // } else {
+        //     curGame.playerTurn = PLAYER_ONE_SYMBOL
+        // }
         io.to(curRoom).emit(Events.GameUpdate, curGame);
 
 

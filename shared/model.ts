@@ -29,9 +29,19 @@ export interface Message {
     lobbyKey?: string;
 }
 
+// Client version of Game. Is just an interface, not a class
 export interface Game {
     board: string[];
-    playerSymbols: Map<string, string>;
+    playerSymbols: {[key: string]: string};
     lobbyKey: string;
-    playerTurn: string;
+    playerTurnId: string;
+    gameState: GameState;
+    winnerId: string | null;
+}
+
+export enum GameState {
+    STARTED = 'started',
+    DRAW = 'draw',
+    WON = 'won',
+    PRE_GAME = 'pre-grame'
 }

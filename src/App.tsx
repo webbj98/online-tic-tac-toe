@@ -22,7 +22,6 @@ function App() {
   
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [chat, setChat] = useState<Message[]>([]);
-  const [chatMessage, setChatMessage] = useState('');
   const [userList, setUserList] = useState<string[]>([]);
   const [userName, setUserName] = useState('');
   const [curGame, setCurGame] = useState<Game>();
@@ -101,7 +100,8 @@ function App() {
   }
 
   const joinRoom = () => {
-    socket.emit(Events.LobbyJoin, window.location.href)
+    const splitUrl = window.location.href.split('/')
+    socket.emit(Events.LobbyJoin, splitUrl[splitUrl.length - 1])
   }
 
   const sendMessage = (inputMsg: string, lobbyKey?: string) => {
@@ -130,12 +130,12 @@ function App() {
     },
     {
       path: '/lobby/:uuid',
-      element: <LobbyPage users={userList} userName={userName} onSetUserName={handleSetUserName} />
+      element: <LobbyPage users={userList} userName={userName} game={curGame} onSetUserName={handleSetUserName} />
     },
-    {
-      path: '/game',
-      element: <GamePage game={curGame} />
-    }
+    // {
+    //   path: '/lobby/:uuid/game',
+    //   element: <GamePage game={curGame} />
+    // }
   ])
 
   return (

@@ -12,38 +12,11 @@ export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users,
     
     useEffect(() => {
         setIsLoading(true)
-        // async function fetchUserList() {
-        //     try {
-        //         const response = await fetch(`http://localhost:${BACKEND_PORT}/lobby/testRoom`, {
-        //             method: 'GET',
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             }
-        //         });
-        //         console.log('result: ', response)
-                
-        //         const result = await response.json();
-        //         if (response.ok) {
-        //             console.log('result: ', result.userList)
-        //             setUsers(result.userList);
-    
-        //         } else {
-        //             throw new Error(result)
-        //         }
-                
-        //     } catch (error) {
-        //         console.log('error: ', error)
-        //     } finally {
-        //         setIsLoading(false)
-        //     }
-        // };
-
-        // console.log('id: ', id)
-        // fetchUserList();
     }, [id])
 
     const handleStartGame = () => {
         socket.emit(Events.GameStart);
+
     }
 
     //TODO: makke a copy room code button

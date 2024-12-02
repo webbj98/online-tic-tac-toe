@@ -2,11 +2,13 @@ import {DefaultEventsMap, Server, Socket } from 'socket.io';
 import { LobbyStatus } from '../../../shared/model';
 import { SERVER_NAMESPACE } from '../../../shared/config';
 import { LobbyManager } from './LobbyManager';
+import { Game } from './Game';
 // import { io, Socket } from "socket.io-client";
 export class Lobby {
     key: string;
     io: Server;
     status: LobbyStatus;
+    game: Game | null;
     // In order to keep LobbyManager up to date, need to pass it in as the parent
     
     // WON'T do lobbyMANGAGER cause can just use a map
@@ -22,6 +24,7 @@ export class Lobby {
         // this.lobbyManager = lobbyManager
         socket.join(this.key);
         // lobbyManager.addLobby(this)
+        this.game = null;
     }
 
     getUsers() {
@@ -29,6 +32,7 @@ export class Lobby {
     }
 
     join(socket: Socket) {
+        console.log(`Socket ${socket.id} is joining lobby ${this.key}`)
         socket.join(this.key);
     }
 
