@@ -37,8 +37,10 @@ export const GamePage: React.FC<{game: Game | undefined}> = ({game}) => {
   const handleClickTile = (idx: number) => {
     // TODO: this may not be needed but doing in-case of state setting issues
     // TODO: check if the player who clicks it is the player whose turn it is
-    if (game.board[idx] == BLANK_SYMBOL && game.gameState !== GameState.WON && game.gameState !== GameState.DRAW) {
-      socket.emit(Events.GameStart)
+    console.log('game.playerTurnId: ', game.playerTurnId)
+    console.log('socket: ', socket.id)
+    if (game.board[idx] == BLANK_SYMBOL && game.playerTurnId === socket.id && game.gameState !== GameState.WON && game.gameState !== GameState.DRAW) {
+      socket.emit(Events.GamePlaceSymbol, idx)
 
       // setBoard((prevBoard) => {
       //   const newBoard = [...prevBoard];

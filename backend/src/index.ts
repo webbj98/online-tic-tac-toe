@@ -4,7 +4,7 @@ import cors from 'cors';
 import {Server } from 'socket.io';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
 import {Events} from '../../shared/events'
-import {Game as GameClient, Message, MessageType} from '../../shared/model'
+import {Game as GameClient, GameState, Message, MessageType} from '../../shared/model'
 import { BACKEND_PORT } from '../../shared/config';
 import { Lobby } from './classes/Lobby';
 import { Game } from './classes/Game';
@@ -126,9 +126,8 @@ io.on('connection', (socket) => {
         // console.log(`rooms ${socketUserNameMap.get(socket.id)} is in: `, socket.rooms.keys())
         // console.log('keyLobbyMap: ', keyLobbyMap)
 
-        
-        const lobbyUsers = getLobbyUsers(io, curLobbyKey);
-        const filteredUsers = lobbyUsers.filter((user) => user != undefined);
+        const lobbyUsers = keyLobbyMap.get(curLobbyKey)?.getUsers() || []
+        // const lobbyUsers = getLobbyUsers(io, curLobbyKey);
 
         const curLobby = keyLobbyMap.get(curLobbyKey);
 
@@ -136,11 +135,12 @@ io.on('connection', (socket) => {
             throw Error(`Player ${socketUserNameMap.get(socket.id)} is not in a lobby.`)
         }
 
-        const newGame = new Game(filteredUsers)
+        const newGame = new Game(lobbyUsers)
         curLobby.game = newGame
 
         // const game = new Game()
 
+        newGame.gameState = GameState.STARTED;
         console.log('newGame player symbol: ', newGame.playerIdSymbolMap)
         const newGameClient: GameClient = {
             board: initBoard,
@@ -157,8 +157,14 @@ io.on('connection', (socket) => {
 
     socket.on(Events.GamePlaceSymbol, (tileIdx: number) => {
         
-        const curRoom = [...socket.rooms.keys()][0];
-        const curGame = lobbyGameMap.get(curRoom)!;
+        const curRoom = [...socket.rooms.keys()][1];
+        console.log('curRoom: ', curRoom)
+        console.log("lobbyGameMap: ", lobbyGameMap)
+        const curGame = keyLobbyMap.get(curRoom)?.game
+
+        if (!curGame) {
+            throw Error(`Lobby ${curRoom} does not have a game`)
+        }
         // TODO: probably make playerTurn be playerTurnSymbol
         // curGame.board[tileIdx] = curGame.playerTurn;
 
@@ -167,7 +173,16 @@ io.on('connection', (socket) => {
         // } else {
         //     curGame.playerTurn = PLAYER_ONE_SYMBOL
         // }
-        io.to(curRoom).emit(Events.GameUpdate, curGame);
+        curGame.placeSymbol(tileIdx)
+        const newGameClient: GameClient = {
+            board: curGame.board,
+            playerSymbols: Object.fromEntries(curGame.playerIdSymbolMap),
+            lobbyKey: curRoom,
+            playerTurnId: curGame.playerTurnId,
+            gameState: curGame.gameState,
+            winnerId: curGame.winnerId
+        }
+        io.to(curRoom).emit(Events.GameUpdate, newGameClient);
 
 
     })
