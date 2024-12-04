@@ -24,14 +24,12 @@ export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users,
         <div>
             <h1>Lobby Page</h1>
 
-            <p>Room Code: 1XYO</p> 
-
             <div>
                 <h2>Users:</h2>
                 {userDisplay}
             </div>
 
-            <button onClick={handleStartGame}>Start Game</button>
+            <button onClick={handleStartGame} disabled={users.length < 2}>Start Game</button>
 
 
 

@@ -1,10 +1,10 @@
 import express from 'express';
 import {createServer } from 'node:http'
 import cors from 'cors';
-import {Server } from 'socket.io';
+import {Server, Socket } from 'socket.io';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
 import {Events} from '../../shared/events'
-import {Game as GameClient, GameState, Message, MessageType} from '../../shared/model'
+import {GameObject, GameState, Message, MessageType} from '../../shared/model'
 import { BACKEND_PORT } from '../../shared/config';
 import { Lobby } from './classes/Lobby';
 import { Game } from './classes/Game';
@@ -23,8 +23,7 @@ const io = new Server(server, {
 const startRows = 3;
 const startCols = 3;
 const BLANK_SYMBOL = '';
-const PLAYER_ONE_SYMBOL = 'X';
-const PLAYER_TWO_SYMBOL = 'O';
+
 // TODO: consider using null instead of a blank string
 const initBoard = new Array<string>(startRows * startCols).fill(BLANK_SYMBOL);
 
@@ -56,22 +55,38 @@ app.get('/lobby/:id', (req, res) => {
     })
 })
 
-io.on('connection', (socket) => {
+io.on(Events.Connect, (socket) => {
     console.log('a user connected');
+
+    socket.on(Events.Disconnecting, () => {
+        const lobbyKey = getUserLobby(socket);
+
+        console.log(`${socketUserNameMap.get(socket.id)} disconnected`);
+
+        console.log('lobby key gotten: ', lobbyKey)
+        if (lobbyKey) {
+
+            sendLeaveLobbyMessage(io, socket.id, lobbyKey);
+            const socketIds = keyLobbyMap.get(lobbyKey)!.getUsers();
+
+            const usersWithoutDisconnecter = socketIds.filter((socketId) => socketId !== socket.id)
+            socket.emit(Events.UserListGet, getSocketUserNames(usersWithoutDisconnecter));
+
+        }
+    })
+
 
     // we have to set up the listeners in the connection listener because
     // we need to establish that when get event from the socket, I can perform the task
     // (we probably don't want to get events from sockets that haven't connected)
     socket.on(Events.LobbyCreate, (callback) => {
         console.log(`User ${socket.id} joining room`);
-        // const lobbyName = crypto.randomUUID();
         console.log('rooms socket is in: before lobby create ', [...socket.rooms.keys()])
         const newLobby = new Lobby(socket, io);
         keyLobbyMap.set(newLobby.key, newLobby)
         console.log('rooms socket is in: after lobby create ', [...socket.rooms.keys()])
         // socket.join(lobby.uuid);
         // socket.join(lobbyName);
-        sendJoinLobbyMessage(io, socket.id, newLobby.key)
         callback({
             newLobbyKey: newLobby.key,
         })
@@ -92,10 +107,11 @@ io.on('connection', (socket) => {
         // console.log('socketUserNameMap: ', socketUserNameMap)
         sendJoinLobbyMessage(io, socket.id, lobbyKey);
         socket.to(lobbyKey).emit(Events.UserListUpdate, socketUserNameMap.get(socket.id));
-        socket.emit(Events.UserListGet, getLobbyUsers(io, lobbyKey));
+        socket.emit(Events.UserListGet, getLobbyUserNames(io, lobbyKey));
         // io.to(roomKey).emit(Events.UserListUpdate, socket.id);
         // io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
         console.log(`${socket.id} joined the room`)
+        // console.log('users in lobby after join: ', lobby.getUsers())
         // console.log('rooms socket is in: ', [...socket.rooms.keys()])
     })
 
@@ -107,17 +123,18 @@ io.on('connection', (socket) => {
         socketUserNameMap.set(socket.id, name)
     })
 
-    socket.on(Events.ChatMessage, (message: Message) => {
+    socket.on(Events.MessageSend, (message: Message) => {
         // console.log(io.of('/').adapter.rooms);
+        console.log('message: ', message)
         if (message.lobbyKey) {
-            io.to(message.lobbyKey).emit(Events.ChatMessage, message);
+            io.to(message.lobbyKey).emit(Events.MessageSend, message);
         } else {
-            io.emit(Events.ChatMessage, message)
+            io.emit(Events.MessageSend, message)
         }        
     })
 
     socket.on(Events.GameStart, () => {
-        // const lobbyUsers = getLobbyUsers(io, )
+        // const lobbyUsers = getLobbyUserNames(io, )
 
         //TODO: change how getting curRoom works. Make it better
         // TODO: Also, make the getting of the socket type better
@@ -127,7 +144,7 @@ io.on('connection', (socket) => {
         // console.log('keyLobbyMap: ', keyLobbyMap)
 
         const lobbyUsers = keyLobbyMap.get(curLobbyKey)?.getUsers() || []
-        // const lobbyUsers = getLobbyUsers(io, curLobbyKey);
+        // const lobbyUsers = getLobbyUserNames(io, curLobbyKey);
 
         const curLobby = keyLobbyMap.get(curLobbyKey);
 
@@ -142,14 +159,7 @@ io.on('connection', (socket) => {
 
         newGame.gameState = GameState.STARTED;
         console.log('newGame player symbol: ', newGame.playerIdSymbolMap)
-        const newGameClient: GameClient = {
-            board: initBoard,
-            playerSymbols: Object.fromEntries(newGame.playerIdSymbolMap),
-            lobbyKey: curLobbyKey,
-            playerTurnId: newGame.playerTurnId,
-            gameState: newGame.gameState,
-            winnerId: newGame.winnerId
-        }
+        const newGameClient = newGame.toGameObject();
 
         io.to(curLobbyKey).emit(Events.GameStart, newGameClient);
         
@@ -165,28 +175,21 @@ io.on('connection', (socket) => {
         if (!curGame) {
             throw Error(`Lobby ${curRoom} does not have a game`)
         }
-        // TODO: probably make playerTurn be playerTurnSymbol
-        // curGame.board[tileIdx] = curGame.playerTurn;
 
-        // if (curGame.playerTurn === PLAYER_ONE_SYMBOL) {
-        //     curGame.playerTurn = PLAYER_TWO_SYMBOL;
-        // } else {
-        //     curGame.playerTurn = PLAYER_ONE_SYMBOL
-        // }
         curGame.placeSymbol(tileIdx)
-        const newGameClient: GameClient = {
-            board: curGame.board,
-            playerSymbols: Object.fromEntries(curGame.playerIdSymbolMap),
-            lobbyKey: curRoom,
-            playerTurnId: curGame.playerTurnId,
-            gameState: curGame.gameState,
-            winnerId: curGame.winnerId
-        }
+        const newGameClient = curGame.toGameObject()
         io.to(curRoom).emit(Events.GameUpdate, newGameClient);
 
 
     })
 })
+
+io.on(Events.Disconnect, (socket) => {
+    socket.on(Events.Disconnect, () => {
+        console.log('got and listend for event')
+    })
+    console.log('---------disconnected socket: ', socket.id)
+}) 
 
 function sendJoinLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
     
@@ -194,14 +197,42 @@ function sendJoinLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
         type: MessageType.SYSTEM,
         text: `${socketUserNameMap.get(socketId)} joined the lobby`
     }
-    io.to(lobbyKey).emit(Events.ChatMessage, message)
+    io.to(lobbyKey).emit(Events.MessageSend, message);
 }
 
-function getLobbyUsers(io: Server, lobbyKey: string) {
-    const userSocketids = Array.from(io.of('/').adapter.rooms.get(lobbyKey) || []);
+function sendLeaveLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
+    const message: Message = {
+        type: MessageType.SYSTEM,
+        text: `${socketUserNameMap.get(socketId)} left the lobby`
+    }
+    console.log('sending leave')
+    io.to(lobbyKey).emit(Events.MessageSend, message);
+}
+
+function getLobbyUserNames(io: Server, lobbyKey: string) {
+    const userSocketIds = Array.from(io.of('/').adapter.rooms.get(lobbyKey) || []);
     // todo: throw error if get socket id and it doesn't exist in map
 
-    return userSocketids.map((socketId) => socketUserNameMap.get(socketId));
+    return userSocketIds.map((socketId) => socketUserNameMap.get(socketId));
+}
+
+function getSocketUserNames(socketIds: string[]) {
+    return socketIds.map((socketId) => socketUserNameMap.get(socketId)); 
+}
+
+// Technically, a socket is in a lobby of its own name so need to filter that out. The socket should only ever be in one lobby though
+function getUserLobby(socket: Socket) {
+    
+    // const roomFromKeys = Object.keys(socket.rooms)
+    const possLobby = Array.from(socket.rooms).filter((roomKey) => keyLobbyMap.has(roomKey));
+    console.log('socket rooms: ', socket.rooms)
+    console.log('keyLobbyMap: ', keyLobbyMap)
+    console.log('pos lobbies: ', possLobby)
+    if (possLobby.length > 0) {
+        return possLobby[0]
+    } else {
+        return null
+    }
 }
 
 server.listen(port, () => {

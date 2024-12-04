@@ -14,8 +14,9 @@ import { socket } from './socket';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/config'
 import { Events } from '../shared/events';
 import Chat from './components/Chat/Chat';
-import {Game, Message, MessageType} from '../shared/model';
+import {GameObject, Message, MessageType} from '../shared/model';
 import UserNameInput from './pages/LobbyPage/UserNameInput';
+import { getLobbyKeyFromUrl } from './util';
 
 function App() {
   // TODO: make game path have an id
@@ -24,7 +25,7 @@ function App() {
   const [chat, setChat] = useState<Message[]>([]);
   const [userList, setUserList] = useState<string[]>([]);
   const [userName, setUserName] = useState('');
-  const [curGame, setCurGame] = useState<Game>();
+  const [curGame, setCurGame] = useState<GameObject>();
   // const navigate = useNavigate();
   
   useEffect(() => {
@@ -48,13 +49,13 @@ function App() {
       setUserList(users)
     }
 
-    function onGameStart(game: Game) {
+    function onGameStart(game: GameObject) {
       // navigate to game page
       setCurGame(game)
       console.log('navigate to new page: ')
     }
 
-    function onGameUpdate(game: Game) {
+    function onGameUpdate(game: GameObject) {
       setCurGame(game)
     }
 
@@ -62,7 +63,7 @@ function App() {
     socket.on('disconnect', onDisconnect);
 
     // socket.on(ROOM_EVENT_NAME, onRoomMsg);
-    socket.on(Events.ChatMessage, onAddMessageToChat);
+    socket.on(Events.MessageSend, onAddMessageToChat);
     socket.on(Events.UserListUpdate, onUpdateUserList);
     socket.on(Events.UserListGet, onGetUserList);
     socket.on(Events.GameStart, onGameStart);
@@ -74,7 +75,7 @@ function App() {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       // socket.off(ROOM_EVENT_NAME, onRoomMsg);
-      socket.off(Events.ChatMessage, onAddMessageToChat);
+      socket.off(Events.MessageSend, onAddMessageToChat);
       socket.off(Events.UserListUpdate, onUpdateUserList);
       socket.off(Events.UserListGet, onGetUserList);
       socket.off(Events.GameStart, onGameStart);
@@ -92,27 +93,19 @@ function App() {
     socket.disconnect();
   }
 
-  const createLobby = () => {
-    socket.emit(Events.LobbyCreate, (newLobbyKey: string) => {
-      // navigate(`navigate/${newLobbyKey}`)
-      
-    })
-  }
-
   const joinRoom = () => {
-    const splitUrl = window.location.href.split('/')
-    socket.emit(Events.LobbyJoin, splitUrl[splitUrl.length - 1])
+    socket.emit(Events.LobbyJoin, getLobbyKeyFromUrl())
   }
 
-  const sendMessage = (inputMsg: string, lobbyKey?: string) => {
+  const sendMessage = (inputMsg: string) => {
     const message: Message = {
       type: MessageType.USER,
       text: inputMsg,
       senderName: userName,
-      ...(lobbyKey ? {lobbyKey} : {})
+      lobbyKey: getLobbyKeyFromUrl()
     };
 
-    socket.emit(Events.ChatMessage, message)
+    socket.emit(Events.MessageSend, message)
   }
 
   const handleSetUserName = (name: string) => {
@@ -146,8 +139,7 @@ function App() {
       <RouterProvider router={router} />
       <button onClick={connect}>Connect</button>
       <button onClick={disconnect}>Disconnect</button>
-      <button onClick={joinRoom}>Join Room</button>
-      
+       
       <Chat messages={chat} onSend={sendMessage}/>
       {/* {chat} */}
     </div>

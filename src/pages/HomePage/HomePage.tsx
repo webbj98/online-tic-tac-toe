@@ -5,11 +5,7 @@ import { useEffect, useState } from "react";
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate()
-    console.log('hi')
-    // const [redirected, setRedirected] = useState(false);
     const [lobbyKey, setNewLobbyKey] = useState('')
-
-
 
     useEffect(() => {
         if (lobbyKey) {

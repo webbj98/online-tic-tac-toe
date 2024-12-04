@@ -3,13 +3,13 @@ import { BACKEND_PORT } from "../../../shared/config"
 import { useParams } from "react-router-dom"
 import UserNameInput from "./UserNameInput";
 import { LobbyMain } from "./LobbyMain";
-import { Game } from "../../../shared/model";
+import { GameObject } from "../../../shared/model";
 import { GamePage } from "../GamePage/GamePage";
 
 export const LobbyPage: React.FC<{
     users: string[], 
     userName: string,
-    game: Game | undefined;
+    game: GameObject | undefined;
     onSetUserName: (name: string) => void
 }>  = ({users, userName, game, onSetUserName}) => {
     console.log('game: ', game)
@@ -20,6 +20,4 @@ export const LobbyPage: React.FC<{
     } else {
         return <UserNameInput onSubmitName={onSetUserName} />
     }
-
-    //TODO: makke a copy room code button
 }

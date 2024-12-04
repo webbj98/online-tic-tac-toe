@@ -37,6 +37,13 @@ export class Lobby {
     }
 
     leave(socket: Socket) {
+        console.log('leaving lobby')
         socket.leave(this.key);
+    }
+
+    static getUserLobby(io: Server, socketId: string) {
+        const lobby =  Array.from(io.of(SERVER_NAMESPACE).adapter.rooms)
+
+
     }
 }

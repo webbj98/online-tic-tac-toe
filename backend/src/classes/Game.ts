@@ -1,5 +1,5 @@
 import { PLAYER_SYMBOLS } from "../../../shared/config";
-import { GameState } from "../../../shared/model";
+import { GameObject, GameState } from "../../../shared/model";
 import { Lobby } from "./Lobby";
 
 
@@ -23,7 +23,7 @@ export class Game {
 
         this.board = new Array<string>(startRows * startCols).fill(BLANK_SYMBOL);
         this.playerTurnId = playerIds[0];
-        this.gameState = GameState.PRE_GAME;
+        this.gameState = GameState.STARTED;
         this.winnerId = null;
     }
 
@@ -43,7 +43,7 @@ export class Game {
             this.gameState = GameState.WON;
             return;
         }
-        // const isDraw = this.checkIsDraw();
+
         if (this.checkIsDraw()) {
             this.gameState = GameState.DRAW;
             return;
@@ -141,5 +141,17 @@ export class Game {
 
     checkIsDraw() {
         return !this.board.includes(BLANK_SYMBOL);
+    }
+
+    // Convert Game into an object usable by the client/front-end
+    toGameObject(): GameObject {
+      console.log('in toGameObject')
+      return {
+        board: this.board,
+        playerSymbols: Object.fromEntries(this.playerIdSymbolMap),
+        playerTurnId: this.playerTurnId,
+        gameState: this.gameState,
+        winnerId: this.winnerId
+      }
     }
 }
