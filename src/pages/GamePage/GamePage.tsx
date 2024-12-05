@@ -32,12 +32,18 @@ export const GamePage: React.FC<{game: GameObject | undefined}> = ({game}) => {
   return (
     <div>
       <h1>Game</h1>
-       <div>{status}</div>
-      <Board board={game.board} numRows={startRows} numCols={startCols} onClickTile={handleClickTile} />
+      <div>{status}</div>
 
-      {game.gameState === GameState.DRAW || game.gameState === GameState.WON && <button onClick={handleResetGame}>
-        New Game
-      </button>} 
+      <div className='game-window'>
+
+        <Board board={game.board} numRows={startRows} numCols={startCols} onClickTile={handleClickTile} />
+
+        {game.gameState === GameState.DRAW || game.gameState === GameState.WON && <button onClick={handleResetGame}>
+          New Game
+        </button>} 
+
+       </div>
+      
     </div>
   )
 }

@@ -1,2 +1,8 @@
+.game-window {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 12px;
+    row-gap: 12px;
 
-
+}

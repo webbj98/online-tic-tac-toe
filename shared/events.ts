@@ -1,5 +1,6 @@
 export const Events = {
-    Connect: 'connection',
+    Connection: 'connection',
+    Connect: 'connect',
     Disconnect: 'disconnect',
     Disconnecting: 'disconnecting',
     LobbyCreate: 'lobby:create',

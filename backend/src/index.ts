@@ -55,7 +55,7 @@ app.get('/lobby/:id', (req, res) => {
     })
 })
 
-io.on(Events.Connect, (socket) => {
+io.on(Events.Connection, (socket) => {
     console.log('a user connected');
 
     socket.on(Events.Disconnecting, () => {
@@ -71,6 +71,7 @@ io.on(Events.Connect, (socket) => {
 
             const usersWithoutDisconnecter = socketIds.filter((socketId) => socketId !== socket.id)
             socket.emit(Events.UserListGet, getSocketUserNames(usersWithoutDisconnecter));
+            socket.emit(Events.MessageSend, )
 
         }
     })

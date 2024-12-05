@@ -29,8 +29,6 @@ export const HomePage: React.FC = () => {
             <h1>Home Screen</h1>
 
             <button onClick={handleCreateLobby}>Create Lobby</button>
-            <Link to='/game'>To Game</Link>
-            <button onClick={() => navigate('/lobby/testName')} >fgdgfd</button>
         </div>
     )
 }

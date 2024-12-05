@@ -17,3 +17,4 @@ export function sendMessage(inputMessage: string, lobbyKey: string, senderName: 
 
     socket.emit(Events.MessageSend, message)
 }
+

@@ -38,7 +38,7 @@ const Chat: React.FC<{messages: Message[], onSend: (msg: string) => void}> = ({m
 
       <div className='chat-action-row'>
         <input className='chat-input' value={currentMsg} onChange={(event) => setCurrentMsg(event.target.value)}  />
-        <button onClick={() => handleSendMsg()}>Send Message</button>
+        <button className='chat-send-button' onClick={() => handleSendMsg()}>Send</button>
 
       </div>
       

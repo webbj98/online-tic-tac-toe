@@ -59,8 +59,8 @@ function App() {
       setCurGame(game)
     }
 
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
+    socket.on(Events.Connect, onConnect);
+    socket.on(Events.Disconnect, onDisconnect);
 
     // socket.on(ROOM_EVENT_NAME, onRoomMsg);
     socket.on(Events.MessageSend, onAddMessageToChat);
@@ -72,8 +72,8 @@ function App() {
     // socket.on(Events.ChatMessage, onAddMessageToChat);
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
+      socket.off(Events.Connect, onConnect);
+      socket.off(Events.Disconnect, onDisconnect);
       // socket.off(ROOM_EVENT_NAME, onRoomMsg);
       socket.off(Events.MessageSend, onAddMessageToChat);
       socket.off(Events.UserListUpdate, onUpdateUserList);
