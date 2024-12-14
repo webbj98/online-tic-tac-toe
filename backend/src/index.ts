@@ -4,7 +4,7 @@ import cors from 'cors';
 import {Server, Socket } from 'socket.io';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
 import {Events} from '../../shared/events'
-import {GameObject, GameState, Message, MessageType} from '../../shared/model'
+import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from '../../shared/model'
 import { BACKEND_PORT } from '../../shared/config';
 import { Lobby } from './classes/Lobby';
 import { Game } from './classes/Game';
@@ -40,7 +40,6 @@ app.get('/', (req, res) => {
     res.send('Hello from Express TypeScript!');
 });
 
-// app.get('/')
 app.get('/lobby/:id', (req, res) => {
     const id = req.params.id;
     console.log('id: ', id)
@@ -214,12 +213,26 @@ function getLobbyUserNames(io: Server, lobbyKey: string) {
     const userSocketIds = Array.from(io.of('/').adapter.rooms.get(lobbyKey) || []);
     // todo: throw error if get socket id and it doesn't exist in map
 
-    return userSocketIds.map((socketId) => socketUserNameMap.get(socketId));
+    const socketIdUserNamePairs: SocketIdUserNamePair[] = userSocketIds.map((socketId) => {
+        
+        const userName = socketUserNameMap.get(socketId);
+        if (!userName) {
+            throw new Error(`There is no username for socket id ${socketId}`)
+        }
+        return {
+            socketId,
+            userName: socketUserNameMap.get(socketId)!,
+
+        }
+    })
+
+    return socketIdUserNamePairs
 }
 
 function getSocketUserNames(socketIds: string[]) {
     return socketIds.map((socketId) => socketUserNameMap.get(socketId)); 
 }
+
 
 // Technically, a socket is in a lobby of its own name so need to filter that out. The socket should only ever be in one lobby though
 function getUserLobby(socket: Socket) {

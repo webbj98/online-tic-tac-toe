@@ -14,7 +14,7 @@ import { socket } from './socket';
 import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/config'
 import { Events } from '../shared/events';
 import Chat from './components/Chat/Chat';
-import {GameObject, Message, MessageType} from '../shared/model';
+import {GameObject, Message, MessageType, SocketIdUserNamePair} from '../shared/model';
 import UserNameInput from './pages/LobbyPage/UserNameInput';
 import { getLobbyKeyFromUrl } from './util';
 
@@ -23,7 +23,7 @@ function App() {
   
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [chat, setChat] = useState<Message[]>([]);
-  const [userList, setUserList] = useState<string[]>([]);
+  const [userIdMap, setUserIdMap] = useState<Map<string, string>>(new Map());
   const [userName, setUserName] = useState('');
   const [curGame, setCurGame] = useState<GameObject>();
   // const navigate = useNavigate();
@@ -41,12 +41,17 @@ function App() {
       setChat((prev) => [...prev, message])
     }
 
-    function onUpdateUserList(user: string) {
-      setUserList((prev) => [...prev, user])
+    function onUpdateUserIdMap(user: SocketIdUserNamePair) {
+      setUserIdMap((prev) => {
+        const newMap = new Map([...prev])
+        newMap.set(user.socketId, user.userName)
+        return newMap
+      })
     }
 
-    function onGetUserList(users: string[]) {
-      setUserList(users)
+    function onGetUserList(users: SocketIdUserNamePair[]) {
+
+      setUserIdMap(new Map(users.map((user) => [user.socketId, user.userName])))
     }
 
     function onGameStart(game: GameObject) {
@@ -64,7 +69,7 @@ function App() {
 
     // socket.on(ROOM_EVENT_NAME, onRoomMsg);
     socket.on(Events.MessageSend, onAddMessageToChat);
-    socket.on(Events.UserListUpdate, onUpdateUserList);
+    socket.on(Events.UserListUpdate, onUpdateUserIdMap);
     socket.on(Events.UserListGet, onGetUserList);
     socket.on(Events.GameStart, onGameStart);
     socket.on(Events.GameUpdate, onGameUpdate)
@@ -76,7 +81,7 @@ function App() {
       socket.off(Events.Disconnect, onDisconnect);
       // socket.off(ROOM_EVENT_NAME, onRoomMsg);
       socket.off(Events.MessageSend, onAddMessageToChat);
-      socket.off(Events.UserListUpdate, onUpdateUserList);
+      socket.off(Events.UserListUpdate, onUpdateUserIdMap);
       socket.off(Events.UserListGet, onGetUserList);
       socket.off(Events.GameStart, onGameStart);
       socket.off(Events.GameUpdate, onGameUpdate);
@@ -123,7 +128,7 @@ function App() {
     },
     {
       path: '/lobby/:uuid',
-      element: <LobbyPage users={userList} userName={userName} game={curGame} onSetUserName={handleSetUserName} />
+      element: <LobbyPage users={userIdMap} userName={userName} game={curGame} onSetUserName={handleSetUserName} />
     },
     // {
     //   path: '/lobby/:uuid/game',

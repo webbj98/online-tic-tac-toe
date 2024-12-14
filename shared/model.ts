@@ -29,6 +29,11 @@ export interface Message {
     lobbyKey?: string;
 }
 
+export interface SocketIdUserNamePair {
+    socketId: string;
+    userName: string;
+}
+
 // Client version of Game. Is just an interface, not a class.
 // The client must request the server to perform actions that modify Game
 export interface GameObject {

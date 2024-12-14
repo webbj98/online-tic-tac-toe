@@ -1,13 +1,13 @@
 import {useEffect, useState} from 'react'
 import "./GamePage.css"
 import { Board } from '../../components/Board/Board';
-import { GameObject, GameState } from '../../../shared/model';
+import { GameObject, GameState, SocketIdUserNamePair } from '../../../shared/model';
 import { socket } from '../../socket';
 import { Events } from '../../../shared/events';
 import { BLANK_SYMBOL } from '../../../shared/config';
 const startRows = 3;
 const startCols = 3;
-export const GamePage: React.FC<{game: GameObject | undefined}> = ({game}) => {
+export const GamePage: React.FC<{game: GameObject | undefined, users: Map<string, string>}> = ({game, users}) => {
   if (!game) {
     return <h1>Issue: No game</h1>
   }
@@ -22,9 +22,9 @@ export const GamePage: React.FC<{game: GameObject | undefined}> = ({game}) => {
     socket.emit(Events.GameStart)
   }
 
-  let status = `${game.playerSymbols[game.playerTurnId]}'s turn!`
-  if (game.gameState === GameState.WON) {
-    status = `${game.winnerId} won!`
+  let status = `${users.get(game.playerTurnId)}'s (${game.playerSymbols[game.playerTurnId]}) turn!`
+  if (game.gameState === GameState.WON) {    
+    status = `${users.get(game?.winnerId || '')} won!`
   } else if (game.gameState === GameState.DRAW) {
     status = 'Draw!'
   }

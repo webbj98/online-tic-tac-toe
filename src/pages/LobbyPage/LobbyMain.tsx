@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { socket } from "../../socket";
 import { Events } from "../../../shared/events";
+import { SocketIdUserNamePair } from "../../../shared/model";
 
-export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users, userName}) => {
+export const LobbyMain: React.FC<{userList: string[], userName: string}> = ({userList, userName}) => {
     const {id} = useParams();
     // const [users, setUsers] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(false)
-    console.log('users: ', users )
-    const userDisplay = users?.map((user) => <div>{user}</div>)
+    // console.log('users: ', users )
+    console.log('userList: ', userList)
+    const userDisplay = userList.map((user) => <div>{user}</div>)
     
     useEffect(() => {
         setIsLoading(true)
@@ -29,7 +31,7 @@ export const LobbyMain: React.FC<{users: string[], userName: string}> = ({users,
                 {userDisplay}
             </div>
 
-            <button onClick={handleStartGame} disabled={users.length < 2}>Start Game</button>
+            <button onClick={handleStartGame} disabled={userList.length < 2}>Start Game</button>
 
 
 
