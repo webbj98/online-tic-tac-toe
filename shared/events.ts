@@ -12,7 +12,8 @@ export const Events = {
     MessageSend: 'message:send',
     GameStart: 'game:start',
     GamePlaceSymbol: 'game:placeSymbol',
-    GameUpdate: 'game:update'
+    GameUpdate: 'game:update',
+    GameStop: 'game:stop'
 
     
     // ChatSystemMessage: 'chat:systemMessage',

@@ -22,6 +22,10 @@ export const GamePage: React.FC<{game: GameObject | undefined, users: Map<string
     socket.emit(Events.GameStart)
   }
 
+  const handleStopGame = () => {
+    socket.emit(Events.GameStop)
+  }
+
   let status = `${users.get(game.playerTurnId)}'s (${game.playerSymbols[game.playerTurnId]}) turn!`
   if (game.gameState === GameState.WON) {    
     status = `${users.get(game?.winnerId || '')} won!`
@@ -41,6 +45,10 @@ export const GamePage: React.FC<{game: GameObject | undefined, users: Map<string
         {game.gameState === GameState.DRAW || game.gameState === GameState.WON && <button onClick={handleResetGame}>
           New Game
         </button>} 
+
+        <button onClick={handleStopGame}>
+          Back to Lobby
+        </button>
 
        </div>
       

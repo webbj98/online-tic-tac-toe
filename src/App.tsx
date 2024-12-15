@@ -25,7 +25,7 @@ function App() {
   const [chat, setChat] = useState<Message[]>([]);
   const [userIdMap, setUserIdMap] = useState<Map<string, string>>(new Map());
   const [userName, setUserName] = useState('');
-  const [curGame, setCurGame] = useState<GameObject>();
+  const [curGame, setCurGame] = useState<GameObject | undefined>();
   // const navigate = useNavigate();
   
   useEffect(() => {
@@ -64,6 +64,10 @@ function App() {
       setCurGame(game)
     }
 
+    function onGameStop() {
+      setCurGame(undefined)
+    }
+
     socket.on(Events.Connect, onConnect);
     socket.on(Events.Disconnect, onDisconnect);
 
@@ -72,7 +76,8 @@ function App() {
     socket.on(Events.UserListUpdate, onUpdateUserIdMap);
     socket.on(Events.UserListGet, onGetUserList);
     socket.on(Events.GameStart, onGameStart);
-    socket.on(Events.GameUpdate, onGameUpdate)
+    socket.on(Events.GameUpdate, onGameUpdate);
+    socket.on(Events.GameStop, onGameStop);
     // socket.on(Events.LobbyUpdate, )
     // socket.on(Events.ChatMessage, onAddMessageToChat);
 
@@ -85,6 +90,7 @@ function App() {
       socket.off(Events.UserListGet, onGetUserList);
       socket.off(Events.GameStart, onGameStart);
       socket.off(Events.GameUpdate, onGameUpdate);
+      socket.off(Events.GameStop, onGameStop);
       // socket.off(Events.ChatSystemMessage, onAddMessageToChat);
     }
   }, [])
