@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
-import { BACKEND_PORT } from "../../../shared/config"
+import { BACKEND_PORT } from "../../../shared/src/config"
 import { useParams } from "react-router-dom"
 import UserNameInput from "./UserNameInput";
 import { LobbyMain } from "./LobbyMain";
-import { GameObject, SocketIdUserNamePair } from "../../../shared/model";
+import { GameObject, SocketIdUserNamePair } from "../../../shared/src/model";
 import { GamePage } from "../GamePage/GamePage";
 
 export const LobbyPage: React.FC<{

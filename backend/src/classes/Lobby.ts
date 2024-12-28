@@ -1,6 +1,6 @@
 import {DefaultEventsMap, Server, Socket } from 'socket.io';
-import { LobbyStatus } from '../../../shared/model';
-import { SERVER_NAMESPACE } from '../../../shared/config';
+import { LobbyStatus } from '../../../shared/src/model';
+import { SERVER_NAMESPACE } from '../../../shared/src/config';
 import { LobbyManager } from './LobbyManager';
 import { Game } from './Game';
 // import { io, Socket } from "socket.io-client";

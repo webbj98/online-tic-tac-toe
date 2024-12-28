@@ -11,10 +11,10 @@ import { HomePage } from './pages/HomePage/HomePage';
 import { GamePage } from './pages/GamePage/GamePage';
 import { LobbyPage } from './pages/LobbyPage/LobbyPage';
 import { socket } from './socket';
-import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/config'
-import { Events } from '../shared/events';
+import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../shared/src/config'
+import { Events } from '../shared/src/events';
 import Chat from './components/Chat/Chat';
-import {GameObject, Message, MessageType, SocketIdUserNamePair} from '../shared/model';
+import {GameObject, Message, MessageType, SocketIdUserNamePair} from '../shared/src/model';
 import UserNameInput from './pages/LobbyPage/UserNameInput';
 import { getLobbyKeyFromUrl } from './util';
 

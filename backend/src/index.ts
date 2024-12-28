@@ -2,12 +2,12 @@ import express from 'express';
 import {createServer } from 'node:http'
 import cors from 'cors';
 import {Server, Socket } from 'socket.io';
-import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/config'
-import {Events} from '../../shared/events'
-import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from '../../shared/model'
-import { BACKEND_PORT } from '../../shared/config';
-import { Lobby } from './classes/Lobby';
-import { Game } from './classes/Game';
+import {TEST_ROOM_NAME, BACKEND_PORT} from '@shared/config'
+import {Events} from '@shared/events'
+import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from '../../shared/src/model'
+// import { BACKEND_PORT } from '../../shared/config.js';
+import { Lobby } from './classes/Lobby.js';
+import { Game } from './classes/Game.js';
 // import { Socket } from 'socket.io-client';
 
 const app = express();

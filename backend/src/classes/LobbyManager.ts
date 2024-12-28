@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { Lobby } from "./Lobby";
-import { SERVER_NAMESPACE } from "../../../shared/config";
+import { SERVER_NAMESPACE } from "../../../shared/src/config";
 
 export class LobbyManager {
 

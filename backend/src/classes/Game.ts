@@ -1,5 +1,5 @@
-import { PLAYER_SYMBOLS } from "../../../shared/config";
-import { GameObject, GameState } from "../../../shared/model";
+import { PLAYER_SYMBOLS } from "../../../shared/src/config";
+import { GameObject, GameState } from "../../../shared/src/model";
 import { Lobby } from "./Lobby";
 
 

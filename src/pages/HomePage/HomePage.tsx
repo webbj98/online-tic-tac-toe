@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom"
 import { socket } from '../../socket';
-import { Events } from "../../../shared/events";
+import { Events } from "../../../shared/src/events";
 import { useEffect, useState } from "react";
 
 export const HomePage: React.FC = () => {

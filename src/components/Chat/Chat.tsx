@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Message, MessageType } from '../../../shared/model'
+import { Message, MessageType } from '../../../shared/src/model'
 import './Chat.css'
 
 const Chat: React.FC<{messages: Message[], onSend: (msg: string) => void}> = ({messages, onSend}) => {
