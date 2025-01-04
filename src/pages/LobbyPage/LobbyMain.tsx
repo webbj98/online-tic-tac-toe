@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { socket } from "../../socket";
-import { Events } from "../../../shared/src/events";
-import { SocketIdUserNamePair } from "../../../shared/src/model";
+import { Events } from "shared/events";
+import { SocketIdUserNamePair } from "shared/model";
 
 export const LobbyMain: React.FC<{userList: string[], userName: string}> = ({userList, userName}) => {
     const {id} = useParams();

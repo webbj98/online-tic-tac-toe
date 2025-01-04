@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react'
 import "./GamePage.css"
 import { Board } from '../../components/Board/Board';
-import { GameObject, GameState, SocketIdUserNamePair } from '../../../shared/src/model';
+import { GameObject, GameState, SocketIdUserNamePair } from 'shared/model';
 import { socket } from '../../socket';
-import { Events } from '../../../shared/src/events';
-import { BLANK_SYMBOL } from '../../../shared/src/config';
+import { Events } from 'shared/events';
+import { BLANK_SYMBOL } from 'shared/config';
 const startRows = 3;
 const startCols = 3;
 export const GamePage: React.FC<{game: GameObject | undefined, users: Map<string, string>}> = ({game, users}) => {

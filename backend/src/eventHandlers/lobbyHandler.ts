@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { Events} from "../../../shared/src/events.js"
-import {Lobby} from "../../../shared/src/model.js";
+import { Events} from "shared/events"
+import {Lobby} from "shared/model";
 
 function register(io: Server, socket: Socket) {
     socket.on(Events.LobbyCreate, (lobby: Lobby) => {
