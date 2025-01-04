@@ -2,9 +2,10 @@ import express from 'express';
 import {createServer } from 'node:http'
 import cors from 'cors';
 import {Server, Socket } from 'socket.io';
-import {TEST_ROOM_NAME, BACKEND_PORT} from '@shared/config'
-import {Events} from '@shared/events'
-import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from '../../shared/src/model'
+// import {TEST_ROOM_NAME, BACKEND_PORT} from '@shared/config.js'
+import {TEST_ROOM_NAME, BACKEND_PORT} from 'shared/config'
+import {Events} from 'shared/events'
+import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from 'shared/model'
 // import { BACKEND_PORT } from '../../shared/config.js';
 import { Lobby } from './classes/Lobby.js';
 import { Game } from './classes/Game.js';

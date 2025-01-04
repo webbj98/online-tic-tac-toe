@@ -20,9 +20,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.1",
+    "shared": "file:../shared",
     "socket.io": "^4.8.1",
     "tsx": "^4.19.2"
   },
   "type": "module"
-  
 }

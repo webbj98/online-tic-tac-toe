@@ -1,6 +1,6 @@
-import { PLAYER_SYMBOLS } from "../../../shared/src/config";
-import { GameObject, GameState } from "../../../shared/src/model";
-import { Lobby } from "./Lobby";
+import { PLAYER_SYMBOLS } from "shared/config";
+import { GameObject, GameState } from "shared/model";
+import { Lobby } from "./Lobby.js";
 
 
 const startRows = 3;
