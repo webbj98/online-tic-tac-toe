@@ -1,1 +1,1 @@
-{"root":["../shared/src/config.ts","../shared/src/events.ts","../shared/src/model.ts","./src/index.ts","./src/classes/game.ts","./src/classes/lobby.ts","./src/classes/lobbymanager.ts","./src/eventhandlers/lobbyhandler.ts","./src/eventhandlers/mischandlers.ts"],"version":"5.7.2"}
+{"root":["./src/index.ts","./src/classes/game.ts","./src/classes/lobby.ts","./src/classes/lobbymanager.ts","./src/eventhandlers/lobbyhandler.ts","./src/eventhandlers/mischandlers.ts"],"version":"5.7.2"}
