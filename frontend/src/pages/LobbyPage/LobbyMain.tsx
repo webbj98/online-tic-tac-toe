@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { socket } from "../../socket";
 import { Events } from "shared/events";
-import { SocketIdUserNamePair } from "shared/model";
 
-export const LobbyMain: React.FC<{userList: string[], userName: string}> = ({userList, userName}) => {
+export const LobbyMain: React.FC<{userList: string[]}> = ({userList}) => {
     const {id} = useParams();
     // const [users, setUsers] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(false)
@@ -20,6 +19,16 @@ export const LobbyMain: React.FC<{userList: string[], userName: string}> = ({use
         socket.emit(Events.GameStart);
 
     }
+
+    // console.log
+
+    // if (isLoading) {
+    //     return (
+    //         <div>
+    //             <h1>Loading...</h1>
+    //         </div>
+    //     )
+    // }
 
     //TODO: makke a copy room code button
     return (

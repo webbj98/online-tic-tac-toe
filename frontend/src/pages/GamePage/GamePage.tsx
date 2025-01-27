@@ -1,7 +1,6 @@
-import {useEffect, useState} from 'react'
 import "./GamePage.css"
 import { Board } from '../../components/Board/Board';
-import { GameObject, GameState, SocketIdUserNamePair } from 'shared/model';
+import { GameObject, GameState } from 'shared/model';
 import { socket } from '../../socket';
 import { Events } from 'shared/events';
 import { BLANK_SYMBOL } from 'shared/config';

@@ -1,5 +1,4 @@
-import { Socket } from "socket.io-client";
-import {Events} from "../../shared/events"
+import {Events} from "shared/events"
 import { socket } from "../socket";
 
 function joinLobby( lobbyId: string) {

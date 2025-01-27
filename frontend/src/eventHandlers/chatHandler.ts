@@ -1,5 +1,5 @@
-import { Events } from "../../shared/events";
-import { Message, MessageType } from "../../shared/model";
+import { Events } from "shared/events";
+import { Message, MessageType } from "shared/model";
 import { socket } from "../socket";
 
 

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { socket } from '../../socket';
 import { Events } from "shared/events";
 import { useEffect, useState } from "react";
@@ -17,7 +17,7 @@ export const HomePage: React.FC = () => {
     const handleCreateLobby = () => {
         socket.emit(Events.LobbyCreate, (newLobbyKey: string) => {
             console.log('newLobbyKey: ', newLobbyKey)
-            setNewLobbyKey(newLobbyKey.newLobbyKey)
+            setNewLobbyKey(newLobbyKey)
             // setRedirected(true)
         })
         

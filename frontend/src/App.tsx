@@ -2,20 +2,14 @@ import { useEffect, useState } from 'react'
 import {
   createBrowserRouter,
   RouterProvider,
-  useNavigate
 } from 'react-router-dom';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { HomePage } from './pages/HomePage/HomePage';
-import { GamePage } from './pages/GamePage/GamePage';
 import { LobbyPage } from './pages/LobbyPage/LobbyPage';
 import { socket } from './socket';
-import {ROOM_EVENT_NAME, TEST_ROOM_NAME} from '../../shared/src/config'
 import { Events } from '../../shared/src/events';
 import Chat from './components/Chat/Chat';
 import {GameObject, Message, MessageType, SocketIdUserNamePair} from '../../shared/src/model';
-import UserNameInput from './pages/LobbyPage/UserNameInput';
 import { getLobbyKeyFromUrl } from './util';
 
 function App() {
@@ -57,7 +51,7 @@ function App() {
     function onGameStart(game: GameObject) {
       // navigate to game page
       setCurGame(game)
-      console.log('navigate to new page: ')
+      // console.log('navigate to new page: ')
     }
 
     function onGameUpdate(game: GameObject) {
@@ -145,6 +139,7 @@ function App() {
   return (
     <div>
       <h1>State: {'' + isConnected}</h1>
+      <h1>HAD SOME CHANGE</h1>
       
 
       <RouterProvider router={router} />

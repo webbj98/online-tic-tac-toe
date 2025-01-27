@@ -1,0 +1,8 @@
+**/node_modules/
+dist
+
+# Ignore system files
+Thumbs.db
+.git
+.DS_Store
+*.log

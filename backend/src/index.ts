@@ -3,7 +3,7 @@ import {createServer } from 'node:http'
 import cors from 'cors';
 import {Server, Socket } from 'socket.io';
 // import {TEST_ROOM_NAME, BACKEND_PORT} from '@shared/config.js'
-import {TEST_ROOM_NAME, BACKEND_PORT} from 'shared/config'
+import {TEST_ROOM_NAME, BACKEND_PORT, FRONTEND_PROD_PORT, FRONTEND_DEV_PORT} from 'shared/config'
 import {Events} from 'shared/events'
 import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from 'shared/model'
 // import { BACKEND_PORT } from '../../shared/config.js';
@@ -13,10 +13,13 @@ import { Game } from './classes/Game.js';
 
 const app = express();
 const server = createServer(app);
-const port = BACKEND_PORT;
+console.log("process.env.PORT: ", process.env.PORT)
+// TODO: change so that port uses env var
+const port = process.env.PORT || BACKEND_PORT;
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173"
+        // TODO: change so that it uses node_env
+        origin: `http://localhost:${process.env.PORT ? FRONTEND_PROD_PORT : FRONTEND_DEV_PORT}`
       }
 })
 
@@ -103,9 +106,7 @@ io.on(Events.Connection, (socket) => {
         console.log('rooms socket is in: after lobby create ', [...socket.rooms.keys()])
         // socket.join(lobby.uuid);
         // socket.join(lobbyName);
-        callback({
-            newLobbyKey: newLobby.key,
-        })
+        callback(newLobby.key)
     });
 
     socket.on(Events.LobbyJoin, (lobbyKey) => {
@@ -288,5 +289,6 @@ function getUserLobbyKey(socket: Socket) {
 }
 
 server.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+    console.log("process.env.PORT: ", process.env.PORT)
+    console.log(`l;l;;lServer is running at http://localhost:${port}`);
 });
