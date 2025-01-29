@@ -11,6 +11,9 @@ export const GamePage: React.FC<{game: GameObject | undefined, users: Map<string
     return <h1>Issue: No game</h1>
   }
 
+  console.log('users : ', users)
+  console.log('game palyer: ', game.playerSymbols)
+
   const handleClickTile = (idx: number) => {
     if (game.board[idx] == BLANK_SYMBOL && game.playerTurnId === socket.id && game.gameState !== GameState.WON && game.gameState !== GameState.DRAW) {
       socket.emit(Events.GamePlaceSymbol, idx)

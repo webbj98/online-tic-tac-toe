@@ -11,6 +11,7 @@ import { Events } from '../../shared/src/events';
 import Chat from './components/Chat/Chat';
 import {GameObject, Message, MessageType, SocketIdUserNamePair} from '../../shared/src/model';
 import { getLobbyKeyFromUrl } from './util';
+import { NO_USERNAME } from './config';
 
 function App() {
   // TODO: make game path have an id
@@ -36,6 +37,7 @@ function App() {
     }
 
     function onUpdateUserIdMap(user: SocketIdUserNamePair) {
+      console.log('user to update: ', user)
       setUserIdMap((prev) => {
         const newMap = new Map([...prev])
         newMap.set(user.socketId, user.userName)
@@ -90,27 +92,39 @@ function App() {
   }, [])
 
 
-  const connect = () => {
-    socket.connect();
-  }
+  // const connect = () => {
+  //   socket.connect();
+  // }
 
-  const disconnect = () => {
-    socket.disconnect();
-  }
+  // const disconnect = () => {
+  //   socket.disconnect();
+  // }
 
   const joinRoom = () => {
     socket.emit(Events.LobbyJoin, getLobbyKeyFromUrl())
   }
 
   const sendMessage = (inputMsg: string) => {
-    const message: Message = {
-      type: MessageType.USER,
-      text: inputMsg,
-      senderName: userName,
-      lobbyKey: getLobbyKeyFromUrl()
-    };
+    let message: Message;
+    try {
+      message = {
+        type: MessageType.USER,
+        text: inputMsg,
+        senderName: userName || NO_USERNAME,
+        lobbyKey: getLobbyKeyFromUrl()
+      };
+      socket.emit(Events.MessageSend, message)
+    } catch (error) {
+      message = {
+        type: MessageType.SYSTEM,
+        text: "Error: Can't send message unless in a lobby",      
+      }
+      chat.push(message)
+      
+    }
+    
 
-    socket.emit(Events.MessageSend, message)
+    
   }
 
   const handleSetUserName = (name: string) => {
@@ -138,13 +152,11 @@ function App() {
 
   return (
     <div>
-      <h1>State: {'' + isConnected}</h1>
-      <h1>HAD SOME CHANGE</h1>
-      
+      <h3>Connected: {'' + isConnected}</h3>      
 
       <RouterProvider router={router} />
-      <button onClick={connect}>Connect</button>
-      <button onClick={disconnect}>Disconnect</button>
+      {/* <button onClick={connect}>Connect</button>
+      <button onClick={disconnect}>Disconnect</button> */}
        
       <Chat messages={chat} onSend={sendMessage}/>
       {/* {chat} */}

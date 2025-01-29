@@ -26,7 +26,7 @@ export const HomePage: React.FC = () => {
 
     return (
         <div>
-            <h1>Home Screen</h1>
+            <h1>Home</h1>
 
             <button onClick={handleCreateLobby}>Create Lobby</button>
         </div>

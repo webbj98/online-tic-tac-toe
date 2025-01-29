@@ -123,7 +123,13 @@ io.on(Events.Connection, (socket) => {
 
         // console.log('socketUserNameMap: ', socketUserNameMap)
         sendJoinLobbyMessage(io, socket.id, lobbyKey);
-        socket.to(lobbyKey).emit(Events.UserListUpdate, socketUserNameMap.get(socket.id));
+        console.log('socketUserNameMap: ', socketUserNameMap);
+        console.log('new socket id: ', socket.id);
+        const userUpdateInfo: SocketIdUserNamePair = {
+            socketId: socket.id,
+            userName: socketUserNameMap.get(socket.id)!
+        }
+        socket.to(lobbyKey).emit(Events.UserListUpdate, userUpdateInfo);
         socket.emit(Events.UserListGet, getLobbyUserNames(io, lobbyKey));
         // io.to(roomKey).emit(Events.UserListUpdate, socket.id);
         // io.to(roomKey).emit(Events.ChatSystemMessage, `${socket.id} joined the lobby`)
