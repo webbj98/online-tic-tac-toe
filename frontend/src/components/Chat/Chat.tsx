@@ -47,6 +47,8 @@ const Chat: React.FC<{messages: Message[], onSend: (msg: string) => void}> = ({m
 
 
     </div>
+
+    
   )
 }
 

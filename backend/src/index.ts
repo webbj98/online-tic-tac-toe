@@ -68,14 +68,17 @@ io.on(Events.Connection, (socket) => {
 
         console.log('lobby key gotten: ', lobbyKey)
         if (lobbyKey) {
-            const curLobby = keyLobbyMap.get(lobbyKey);
+            const curLobby = keyLobbyMap.get(lobbyKey)!;
 
             sendLeaveLobbyMessage(io, socket.id, lobbyKey);
             const socketIds = keyLobbyMap.get(lobbyKey)!.getUsers();
 
-            const usersWithoutDisconnecter = socketIds.filter((socketId) => socketId !== socket.id)
-            socket.emit(Events.UserListGet, getSocketUserNames(usersWithoutDisconnecter));
-            // socket.emit(Events.MessageSend, )
+            const usersWithoutDisconnecter = socketIds.filter((socketId) => socketId !== socket.id);
+            console.log('usersWithoutDisconnecter: ', usersWithoutDisconnecter);
+            
+            console.log('socketUserNameMap: ', socketUserNameMap)
+            io.to(curLobby.key).emit(Events.UserListGet, getSocketUserNames(usersWithoutDisconnecter))
+            // socket.emit(Events.UserListGet, getSocketUserNames(usersWithoutDisconnecter));
 
             // If the player is one of the players in game, end the game
             if (curLobby?.game?.playerIdSymbolMap.has(socket.id)) {
@@ -274,10 +277,17 @@ function getLobbyUserNames(io: Server, lobbyKey: string) {
     return socketIdUserNamePairs
 }
 
-function getSocketUserNames(socketIds: string[]) {
-    return socketIds.map((socketId) => socketUserNameMap.get(socketId)); 
-}
+function getSocketUserNames(socketIds: string[]): SocketIdUserNamePair[] {
+    const socketIdUserNames: SocketIdUserNamePair[] = socketIds.map((socketId) => {
+        return {
+            socketId: socketId,
+            // Have handling for if undefined
+            userName: socketUserNameMap.get(socketId)!
+        }
+    }) 
 
+    return socketIdUserNames;
+}
 
 // Technically, a socket is in a lobby of its own name so need to filter that out. The socket should only ever be in one lobby though
 function getUserLobbyKey(socket: Socket) {

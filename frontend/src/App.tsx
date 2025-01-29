@@ -46,6 +46,7 @@ function App() {
     }
 
     function onGetUserList(users: SocketIdUserNamePair[]) {
+      console.log('Get user list: ', users)
 
       setUserIdMap(new Map(users.map((user) => [user.socketId, user.userName])))
     }

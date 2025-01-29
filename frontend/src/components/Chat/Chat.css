@@ -1,10 +1,16 @@
+:root {
+    --text-spacing: 12px;
+    --chat-margin: 8px;
+}
+
 .chat {
     border: 1px solid black;
     width: 25rem;
     height: 10rem;
     display: flex;
     flex-direction: column;
-    
+    margin-top: var(--chat-margin);
+    margin-bottom: var(--chat-margin);
     /* text-align: left; */
 }
 
@@ -16,8 +22,8 @@
     border: 1px solid black;
     height: 70%;
     
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: var(--text-spacing);
+    padding-right: var(--text-spacing);
     justify-content: left;
 
 }
@@ -37,6 +43,7 @@
 
 .chat-input {
     width: 60%;
+    padding-left: var(--text-spacing)
     /* height: 100%; */
     /* display: flex; */
     /* height: fit-content; */

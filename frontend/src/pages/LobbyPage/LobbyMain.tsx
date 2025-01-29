@@ -17,18 +17,7 @@ export const LobbyMain: React.FC<{userList: string[]}> = ({userList}) => {
 
     const handleStartGame = () => {
         socket.emit(Events.GameStart);
-
     }
-
-    // console.log
-
-    // if (isLoading) {
-    //     return (
-    //         <div>
-    //             <h1>Loading...</h1>
-    //         </div>
-    //     )
-    // }
 
     //TODO: makke a copy room code button
     return (
@@ -39,12 +28,9 @@ export const LobbyMain: React.FC<{userList: string[]}> = ({userList}) => {
                 <h2>Users:</h2>
                 {userDisplay}
             </div>
+            <br/>
 
             <button onClick={handleStartGame} disabled={userList.length < 2}>Start Game</button>
-
-
-
-
         </div>
     )
 }

@@ -1,1 +1,1 @@
-export const NO_USERNAME = 'No Username'
+export const NO_USERNAME = '<No_Username>'
