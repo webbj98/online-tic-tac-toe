@@ -2,8 +2,7 @@ import express from 'express';
 import {createServer } from 'node:http'
 import cors from 'cors';
 import {Server, Socket } from 'socket.io';
-// import {TEST_ROOM_NAME, BACKEND_PORT} from '@shared/config.js'
-import {TEST_ROOM_NAME, BACKEND_PORT, FRONTEND_PROD_PORT, FRONTEND_DEV_PORT} from 'shared/config'
+import { BACKEND_PORT, FRONTEND_PROD_PORT, FRONTEND_DEV_PORT} from 'shared/config'
 import {Events} from 'shared/events'
 import {GameObject, GameState, Message, MessageType, SocketIdUserNamePair} from 'shared/model'
 // import { BACKEND_PORT } from '../../shared/config.js';
@@ -23,24 +22,13 @@ const io = new Server(server, {
       }
 })
 
-// 
-const startRows = 3;
-const startCols = 3;
-const BLANK_SYMBOL = '';
-
-// TODO: consider using null instead of a blank string
-const initBoard = new Array<string>(startRows * startCols).fill(BLANK_SYMBOL);
-
 const socketUserNameMap = new Map<string, string>()
-// const lobbyGameMap = new Map<string, Game>(); 
 const keyLobbyMap = new Map<string, Lobby>()
-// const io = new Server(app)
 
 app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    console.log('lmao')
     res.send('Hello from Express TypeScript!');
 });
 
@@ -107,8 +95,6 @@ io.on(Events.Connection, (socket) => {
         const newLobby = new Lobby(socket, io);
         keyLobbyMap.set(newLobby.key, newLobby)
         console.log('rooms socket is in: after lobby create ', [...socket.rooms.keys()])
-        // socket.join(lobby.uuid);
-        // socket.join(lobbyName);
         callback(newLobby.key)
     });
 
@@ -152,8 +138,8 @@ io.on(Events.Connection, (socket) => {
     socket.on(Events.MessageSend, (message: Message) => {
         // console.log(io.of('/').adapter.rooms);
         console.log('message: ', message)
-        if (message.lobbyKey) {
-            io.to(message.lobbyKey).emit(Events.MessageSend, message);
+        if (isMessageFromLobby(message)) {
+            io.to(message.lobbyKey!).emit(Events.MessageSend, message);
         } else {
             io.emit(Events.MessageSend, message)
         }        
@@ -253,7 +239,6 @@ function sendLeaveLobbyMessage(io: Server, socketId: string, lobbyKey: string) {
         type: MessageType.SYSTEM,
         text: `${socketUserNameMap.get(socketId)} left the lobby`
     }
-    console.log('sending leave')
     io.to(lobbyKey).emit(Events.MessageSend, message);
 }
 
@@ -304,7 +289,11 @@ function getUserLobbyKey(socket: Socket) {
     }
 }
 
+function isMessageFromLobby(message: Message) {
+    return Boolean(message.lobbyKey)
+}
+
 server.listen(port, () => {
     console.log("process.env.PORT: ", process.env.PORT)
-    console.log(`l;l;;lServer is running at http://localhost:${port}`);
+    console.log(`Server is running at http://localhost:${port}`);
 });

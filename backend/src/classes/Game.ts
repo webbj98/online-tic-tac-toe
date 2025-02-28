@@ -29,12 +29,12 @@ export class Game {
 
     placeSymbol(tileIdx: number) {
         // todo: 
-        const symbol = this.playerIdSymbolMap.get(this.playerTurnId);
+        const currentPlayerTurnSymbol = this.playerIdSymbolMap.get(this.playerTurnId);
 
-        if (!symbol) {
-            throw Error(`Tried to place '${symbol}' when it is not their turn.`)
+        if (!currentPlayerTurnSymbol) {
+            throw Error(`Tried to place '${currentPlayerTurnSymbol}' when it is not their turn.`)
         }
-        this.board[tileIdx] = symbol;
+        this.board[tileIdx] = currentPlayerTurnSymbol;
         console.log('boards new mark: ', this.board[tileIdx])
         const winner = this.findWinner();
 

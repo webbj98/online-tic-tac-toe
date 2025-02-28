@@ -54,7 +54,6 @@ function App() {
     function onGameStart(game: GameObject) {
       // navigate to game page
       setCurGame(game)
-      // console.log('navigate to new page: ')
     }
 
     function onGameUpdate(game: GameObject) {
@@ -123,9 +122,6 @@ function App() {
       chat.push(message)
       
     }
-    
-
-    
   }
 
   const handleSetUserName = (name: string) => {
@@ -160,7 +156,6 @@ function App() {
       <button onClick={disconnect}>Disconnect</button> */}
        
       <Chat messages={chat} onSend={sendMessage}/>
-      {/* {chat} */}
     </div>
   )
 }
